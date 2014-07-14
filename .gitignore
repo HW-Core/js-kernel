@@ -79,6 +79,8 @@ local.properties
 #
 
 .htaccess
+.bower.json
+
 
 
 
