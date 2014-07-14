@@ -2,6 +2,12 @@
     "name" : "Hw2/Js/kernel",
     "license" : "http://www.hyperweb2.com/terms",
     "dependencies" : {
-        "%library" : "hw2-core/js-library#*"
+        "%library" : "hw2-core/js-library#*",
+        "jquery/jquery" : "jquery/jquery#2.1.1",
+        "%requirejs" : "jrburke/requirejs#2.1.14"
+    },
+    "devDependencies" : {
+        "jquery/qunit" : "jquery/qunit#v1.14.0",
+        "%sinonjs" : "cjohansen/Sinon.JS#v1.10.3"
     }
 }
