@@ -4,10 +4,10 @@
     "dependencies" : {
         "%library" : "hw2-core/js-library#*",
         "jquery/jquery" : "jquery/jquery#2.1.1",
-        "%requirejs" : "jrburke/requirejs#2.1.14"
+        "requirejs" : "jrburke/requirejs#2.1.14"
     },
     "devDependencies" : {
         "jquery/qunit" : "jquery/qunit#v1.14.0",
-        "%sinonjs" : "cjohansen/Sinon.JS#v1.10.3"
+        "sinonjs" : "cjohansen/Sinon.JS#v1.10.3"
     }
 }
