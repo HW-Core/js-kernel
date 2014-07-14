@@ -1,5 +1,5 @@
 {
-    "name" : "Hw2/Js/init",
+    "name" : "Hw2/Js/kernel",
     "license" : "http://www.hyperweb2.com/terms",
     "dependencies" : {
         "%library" : "hw2-core/js-library#*"
