@@ -12,5 +12,8 @@
             "jquery/qunit : jquery/qunit#v1.14.0",
             "sinonjs : cjohansen/Sinon.JS#v1.10.3"
         ]
-    }
+    },
+    "keep" : [
+        ".git"
+    ]
 }
