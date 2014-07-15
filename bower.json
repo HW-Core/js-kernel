@@ -9,9 +9,9 @@
     "devDependencies" : {
         "//" : "use files to save space",
         "core-dep/qunit" : "http://code.jquery.com/qunit/qunit-1.14.0.js",
-        "core-dep/qunit/style.css" : "http://code.jquery.com/qunit/qunit-1.14.0.css",
+        "core-dep/qunit/style" : "http://code.jquery.com/qunit/qunit-1.14.0.css",
         "core-dep/sinon" : "http://sinonjs.org/releases/sinon-1.10.3.js",
-        "core-dep/sinon/qunit-plugin.js" : "http://sinonjs.org/releases/sinon-qunit-1.0.0.js"
+        "core-dep/sinon/qunit-plugin" : "http://sinonjs.org/releases/sinon-qunit-1.0.0.js"
     },
     "keep" : [
         ".git"
