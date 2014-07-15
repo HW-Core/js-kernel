@@ -3,11 +3,14 @@
     "license" : "http://www.hyperweb2.com/terms",
     "dependencies" : {
         "%library" : "hw2-core/js-library#*",
-        "jquery/jquery" : "jquery/jquery#2.1.1",
-        "requirejs" : "jrburke/requirejs#2.1.14"
+        "core-dep/jquery" : "jquery/jquery#2.1.1",
+        "core-dep/requirejs-" : "jrburke/requirejs#2.1.14"
     },
     "devDependencies" : {
-        "jquery/qunit" : "jquery/qunit#v1.14.0",
-        "sinonjs" : "cjohansen/Sinon.JS#v1.10.3"
+        "//" : [
+            "Commented for now since they are already included in jquery",
+            "jquery/qunit : jquery/qunit#v1.14.0",
+            "sinonjs : cjohansen/Sinon.JS#v1.10.3"
+        ]
     }
 }
