@@ -4,7 +4,7 @@
     "dependencies" : {
         "%library" : "hw2-core/js-library#*",
         "core-dep/jquery" : "jquery/jquery#2.1.1",
-        "core-dep/requirejs-" : "jrburke/requirejs#2.1.14"
+        "core-dep/requirejs" : "jrburke/requirejs#2.1.14"
     },
     "devDependencies" : {
         "//" : [
