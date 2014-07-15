@@ -13,6 +13,10 @@
         "core-dep/sinon" : "http://sinonjs.org/releases/sinon-1.10.3.js",
         "core-dep/sinon/qunit-plugin" : "http://sinonjs.org/releases/sinon-qunit-1.0.0.js"
     },
+    "//" : "ensure we keep the right git repository configurations when we install it manually",
+    "ignore" : [
+        ".git"
+    ],
     "keep" : [
         ".git"
     ]
