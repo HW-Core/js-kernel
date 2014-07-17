@@ -4,10 +4,11 @@
     "dependencies" : {
         "%library" : "hw2-core/js-library#*",
         "core-dep/jquery" : "http://code.jquery.com/jquery-2.1.1.min.js",
-        "core-dep/requirejs" : "http://requirejs.org/docs/release/2.1.14/minified/require.js"
+        "core-dep/requirejs/requirejs" : "http://requirejs.org/docs/release/2.1.14/minified/require.js"
     },
     "devDependencies" : {
         "//" : "use files to save space",
+        "core-dep/requirejs/r" : "http://requirejs.org/docs/release/2.1.14/r.js",
         "core-dep/qunit" : "http://code.jquery.com/qunit/qunit-1.14.0.js",
         "core-dep/qunit/style" : "http://code.jquery.com/qunit/qunit-1.14.0.css",
         "core-dep/sinon" : "http://sinonjs.org/releases/sinon-1.10.3.js",
