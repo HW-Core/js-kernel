@@ -2,11 +2,12 @@ module.exports = function(action, config, modulePath) {
 
     if (action == "postinstall") {
         var fs = require('fs');
+        var cwd=(config.cwd || process.cwd());
         // copy to root overwriting existing if any
         fs.createReadStream(modulePath + '/_hw2/index_files/index.html')
-                .pipe(fs.createWriteStream(config.cwd + '/index.html'));
+                .pipe(fs.createWriteStream( cwd + '/index.html'));
 
-        var mocha = config.cwd+"/"+config.directory + '/core-dep/mocha/';
+        var mocha = cwd+"/"+config.directory + '/core-dep/mocha/';
         fs.createReadStream(modulePath + '/_hw2/mocha_custom/bower.custom.json')
                 .pipe(fs.createWriteStream(mocha + 'bower.custom.json'));
 
@@ -16,7 +17,7 @@ module.exports = function(action, config, modulePath) {
 
             var exec = require('child_process').exec;
 
-            exec("hw2-bower update core-dep/mocha --force", {cwd:config.cwd});
+            exec("hw2-bower update core-dep/mocha --force", {cwd:cwd});
         });
     }
 };
