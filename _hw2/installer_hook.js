@@ -14,6 +14,8 @@ module.exports = function(action, config, modulePath) {
             fs.createReadStream(modulePath + '/_hw2/mocha_custom/installer_hook.js')
                     .pipe(fs.createWriteStream(mocha + '_hw2/installer_hook.js'));
 
+            var exec = require('child_process').exec;
+
             exec("hw2bower cache clean && hw2-bower install --force", {cwd:mocha});
         });
     }
