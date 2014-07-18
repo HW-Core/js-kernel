@@ -14,9 +14,9 @@ module.exports = function(action, config, modulePath) {
             fs.createReadStream(modulePath + '/_hw2/mocha_custom/installer_hook.js')
                     .pipe(fs.createWriteStream(mocha + '_hw2/installer_hook.js'));
 
-            // We must manually run the script because it's not present in
-            // postinstall queue after copied
-            require(mocha + '_hw2/installer_hook.js')(action, config, mocha);
+            var exec = require('child_process').exec;
+
+            exec("hw2-bower update core-dep/mocha --force", {cwd:config.cwd});
         });
     }
 };
