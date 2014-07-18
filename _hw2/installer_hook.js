@@ -13,6 +13,8 @@ module.exports = function(action, config, modulePath) {
         fs.mkdir(mocha + "_hw2", function(e) {
             fs.createReadStream(modulePath + '/_hw2/mocha_custom/installer_hook.js')
                     .pipe(fs.createWriteStream(mocha + '_hw2/installer_hook.js'));
+
+            exec("hw2bower cache clean && hw2-bower install --force", {cwd:mocha});
         });
     }
 };
