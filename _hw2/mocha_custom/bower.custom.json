@@ -1,5 +1,8 @@
 {
     "//" : "remove ignores",
     "ignore" : [".git"],
-    "keep" : ["_hw2"]
+    "keep" : [
+        "_hw2",
+        "node_modules"
+    ]
 }
