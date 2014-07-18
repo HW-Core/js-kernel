@@ -1,4 +1,3 @@
-var program = require('commander');
 var exec = require('child_process').exec;
 
 module.exports = function(action, config, modulePath) {

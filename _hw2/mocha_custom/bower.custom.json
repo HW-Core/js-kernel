@@ -1,4 +1,5 @@
 {
     "//" : "remove ignores",
-    "ignore" : []
+    "ignore" : [".git"],
+    "keep" : ["_hw2"]
 }
