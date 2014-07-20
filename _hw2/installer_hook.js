@@ -14,6 +14,12 @@ module.exports = function(action, config, modulePath) {
         var mocha = path.join(config.cwd, config.directory, 'core-dep/mocha/');
         fs.createReadStream(path.join(modulePath, '_hw2/mocha_custom/bower.custom.json'))
                 .pipe(fs.createWriteStream(mocha + 'bower.custom.json'));
+        
+        // workaround: to avoid _hw2 folder deletations after update we've
+        // to update .bower.json right now since the "keep" procedure
+        // take care of previous json, not new one
+        fs.createReadStream(path.join(modulePath, '_hw2/mocha_custom/bower.custom.json'))
+                .pipe(fs.createWriteStream(mocha + '.bower.json'));
 
         fs.mkdir(path.join(mocha, "_hw2"), function(e) {
             fs.createReadStream(path.join(modulePath, '/_hw2/mocha_custom/installer_hook.js'))
