@@ -2,6 +2,8 @@ var path=require("path");
 
 module.exports = function(action, config, modulePath) {
     if (action == "postinstall") {
+        Console.log("Kernel postinstall event...");
+
         var fs = require('fs');
         config.cwd=config.cwd || process.cwd();
 
