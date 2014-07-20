@@ -14,7 +14,7 @@ module.exports = function(action, config, modulePath) {
         var mocha = path.join(config.cwd, config.directory, 'core-dep/mocha/');
         fs.createReadStream(path.join(modulePath, '_hw2/mocha_custom/bower.custom.json'))
                 .pipe(fs.createWriteStream(mocha + 'bower.custom.json'));
-        
+
         // workaround: to avoid _hw2 folder deletations after update we've
         // to update .bower.json right now since the "keep" procedure
         // take care of previous json, not new one
@@ -27,7 +27,9 @@ module.exports = function(action, config, modulePath) {
 
             var exec = require('child_process').exec;
 
-            exec("hw2-bower cache clean mocha && hw2-bower update core-dep/mocha --force", {cwd: config.cwd}, function(error, stdout, stderr) {
+            exec("hw2-bower cache clean mocha && \
+                    hw2-bower update core-dep/mocha --config.directory=" + config.directory + " --force",
+                    {cwd: config.cwd}, function(error, stdout, stderr) {
                 console.log('Installing mocha node modules...');
 
                 if (stderr !== null) {
