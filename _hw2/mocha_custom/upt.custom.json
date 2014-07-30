@@ -1,5 +1,4 @@
 {
-    "name" : "mocha",
     "//" : "remove ignores",
     "ignore" : [".git"],
     "keep" : [
