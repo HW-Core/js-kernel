@@ -1,0 +1,21 @@
+{
+    "name": "Hw2/Js/kernel",
+    "license": "http://www.hyperweb2.com/terms",
+    "dependencies": {
+        "Hw2/dep/jquery": "http://code.jquery.com/jquery-2.1.1.min.js",
+        "Hw2/dep/requirejs/requirejs": "http://requirejs.org/docs/release/2.1.14/minified/require.js"
+    },
+    "devDependencies": {
+        "//": "use files to save space",
+        "%tests": "hw2-core/js-kernel#tests",
+        "Hw2/dep/requirejs/r": "http://requirejs.org/docs/release/2.1.14/r.js",
+        "Hw2/dep/sinon": "http://sinonjs.org/releases/sinon-1.10.3.js",
+        "Hw2/dep/sinon/qunit-plugin": "http://sinonjs.org/releases/sinon-qunit-1.0.0.js",
+        "Hw2/dep/mocha": "https://github.com/visionmedia/mocha.git#1.20.1",
+        "Hw2/dep/chai": "http://chaijs.com/chai.js"
+    },
+    "//": "ensure we keep the right git repository configurations",
+    "keep": [
+        ".git"
+    ]
+}
