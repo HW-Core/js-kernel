@@ -1,0 +1,8 @@
+{
+    "name" : "Hw2/Js/kernel/tests",
+    "license" : "http://www.hyperweb2.com/terms",
+    "//" : "ensure we keep the right git repository configurations",
+    "keep" : [
+        ".git"
+    ]
+}
