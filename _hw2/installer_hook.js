@@ -27,14 +27,15 @@ module.exports = function(action,config,name,pkgPath,newMeta,oldMeta,callback) {
 
             var exec = require('child_process').exec;
 
-            exec("hw2-bower cache clean mocha && \
-                    hw2-bower update core-dep/mocha --config.directory=" + config.directory + " --force",
+            exec("upt cache clean mocha && \
+                    upt update hw2/dep/mocha --config.directory=" + config.directory + " --force",
                     {cwd: config.cwd}, function(error, stdout, stderr) {
                 console.log('Installing mocha node modules...');
 
                 if (stderr !== null) {
                     console.log('' + stderr);
                 }
+
                 if (stdout !== null) {
                     console.log('' + stdout);
                 }
