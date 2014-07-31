@@ -6,22 +6,22 @@ module.exports = function(action,config,name,pkgPath,newMeta,oldMeta,callback) {
         config.cwd = config.cwd || process.cwd();
 
         // copy to root overwriting existing if any
-        fs.createReadStream(pkgPath + '/_hw2/index_files/index.html')
+        fs.createReadStream(pkgPath + '/_upt/index_files/index.html')
                 .pipe(fs.createWriteStream(path.join(config.cwd, 'index.html')));
 
         var mocha = path.join(config.cwd, config.directory, 'Hw2/dep/mocha/');
-        fs.createReadStream(path.join(pkgPath, '_hw2/mocha_custom/upt.custom.json'))
+        fs.createReadStream(path.join(pkgPath, '_upt/mocha_custom/upt.custom.json'))
                 .pipe(fs.createWriteStream(mocha + 'upt.custom.json'));
 
-        // workaround: to avoid _hw2 folder deletations after update we've
+        // workaround: to avoid _upt folder deletations after update we've
         // to update .bower.json right now since the "keep" procedure
         // take care of previous json, not new one
-        fs.createReadStream(path.join(pkgPath, '_hw2/mocha_custom/upt.custom.json'))
+        fs.createReadStream(path.join(pkgPath, '_upt/mocha_custom/upt.custom.json'))
                 .pipe(fs.createWriteStream(mocha + '.upt.json'));
 
-        fs.mkdir(path.join(mocha, "_hw2"), function(e) {
-            fs.createReadStream(path.join(pkgPath, '/_hw2/mocha_custom/installer_hook.js'))
-                    .pipe(fs.createWriteStream(path.join(mocha, '_hw2/installer_hook.js')));
+        fs.mkdir(path.join(mocha, "_upt"), function(e) {
+            fs.createReadStream(path.join(pkgPath, '/_upt/mocha_custom/installer_hook.js'))
+                    .pipe(fs.createWriteStream(path.join(mocha, '_upt/installer_hook.js')));
 
             var exec = require('child_process').exec;
 
