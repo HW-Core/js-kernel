@@ -80,7 +80,7 @@ local.properties
 
 .htaccess
 tests/
-.bower.json
+.upt.json
 
 
 
