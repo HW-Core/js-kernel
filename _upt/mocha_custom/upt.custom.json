@@ -3,7 +3,7 @@
     "//" : "remove ignores",
     "ignore" : [".git"],
     "keep" : [
-        "_hw2",
+        "_upt",
         "node_modules"
     ]
 }
