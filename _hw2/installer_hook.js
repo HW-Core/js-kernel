@@ -2,8 +2,6 @@ var path = require("path");
 
 module.exports = function(action,config,name,pkgPath,newMeta,oldMeta,callback) {
     if (action == "postinstall") {
-        console.log("Kernel postinstall event...");
-
         var fs = require('fs');
         config.cwd = config.cwd || process.cwd();
 
@@ -12,14 +10,14 @@ module.exports = function(action,config,name,pkgPath,newMeta,oldMeta,callback) {
                 .pipe(fs.createWriteStream(path.join(config.cwd, 'index.html')));
 
         var mocha = path.join(config.cwd, config.directory, 'Hw2/dep/mocha/');
-        fs.createReadStream(path.join(pkgPath, '_hw2/mocha_custom/bower.custom.json'))
-                .pipe(fs.createWriteStream(mocha + 'bower.custom.json'));
+        fs.createReadStream(path.join(pkgPath, '_hw2/mocha_custom/upt.custom.json'))
+                .pipe(fs.createWriteStream(mocha + 'upt.custom.json'));
 
         // workaround: to avoid _hw2 folder deletations after update we've
         // to update .bower.json right now since the "keep" procedure
         // take care of previous json, not new one
-        fs.createReadStream(path.join(pkgPath, '_hw2/mocha_custom/bower.custom.json'))
-                .pipe(fs.createWriteStream(mocha + '.bower.json'));
+        fs.createReadStream(path.join(pkgPath, '_hw2/mocha_custom/upt.custom.json'))
+                .pipe(fs.createWriteStream(mocha + '.upt.json'));
 
         fs.mkdir(path.join(mocha, "_hw2"), function(e) {
             fs.createReadStream(path.join(pkgPath, '/_hw2/mocha_custom/installer_hook.js'))
@@ -28,9 +26,9 @@ module.exports = function(action,config,name,pkgPath,newMeta,oldMeta,callback) {
             var exec = require('child_process').exec;
 
             exec("upt cache clean mocha && \
-                    upt update hw2/dep/mocha --config.directory=" + config.directory + " --force",
+                    upt update Hw2/dep/mocha --config.directory=" + config.directory + " --force",
                     {cwd: config.cwd}, function(error, stdout, stderr) {
-                console.log('Installing mocha node modules...');
+                console.log('updating mocha...');
 
                 if (stderr !== null) {
                     console.log('' + stderr);
@@ -42,7 +40,13 @@ module.exports = function(action,config,name,pkgPath,newMeta,oldMeta,callback) {
                 if (error !== null) {
                     console.log('' + error);
                 }
+
+                callback();
             });
         });
+
+
+    } else {
+        callback();
     }
 };

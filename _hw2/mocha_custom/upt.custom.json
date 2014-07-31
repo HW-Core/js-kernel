@@ -1,4 +1,5 @@
 {
+    "name" : "Hw2/dep/mocha",
     "//" : "remove ignores",
     "ignore" : [".git"],
     "keep" : [
