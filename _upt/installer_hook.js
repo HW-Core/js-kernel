@@ -1,51 +1,40 @@
-var path = require("path");
+module.exports = function(action, config, name, pkgPath, newMeta, oldMeta, callback) {
+    var path = require("path");
+    var mkdirp = require('mkdirp');
+    var fs = require('fs');
 
-module.exports = function(action,config,name,pkgPath,newMeta,oldMeta,callback) {
-    if (action == "postinstall") {
-        var fs = require('fs');
+    if (action == "postresolved" && !config.cmdOptions.production) {
+        console.log("Creating mocha hooks and customizations..");
+
         config.cwd = config.cwd || process.cwd();
 
-        // copy to root overwriting existing if any
-        fs.createReadStream(pkgPath + '/_upt/index_files/index.html')
-                .pipe(fs.createWriteStream(path.join(config.cwd, 'index.html')));
-
         var mocha = path.join(config.cwd, config.directory, 'Hw2/dep/mocha/');
+        var mocha_upt=path.join(mocha, "_upt")
+
+        mkdirp.sync(mocha_upt); // create mocha folder + _upt
+
+        // copy overwriting
         fs.createReadStream(path.join(pkgPath, '_upt/mocha_custom/upt.custom.json'))
-                .pipe(fs.createWriteStream(mocha + 'upt.custom.json'));
+        .pipe(fs.createWriteStream(path.join(mocha,'upt.custom.json'))
+                .on("finish",function() {
 
-        // workaround: to avoid _upt folder deletations after update we've
-        // to update .bower.json right now since the "keep" procedure
-        // take care of previous json, not new one
-        fs.createReadStream(path.join(pkgPath, '_upt/mocha_custom/upt.custom.json'))
-                .pipe(fs.createWriteStream(mocha + '.upt.json'));
+                        // workaround: to avoid _upt folder deletations after update we've
+                        // to update .upt.json right now since the "keep" procedure
+                        // take care of previous json, not new one
+                        fs.createReadStream(path.join(pkgPath, '_upt/mocha_custom/upt.custom.json'))
+                        .pipe(fs.createWriteStream(path.join(mocha , '.upt.json'))
+                                 .on("finish",function() {
 
-        fs.mkdir(path.join(mocha, "_upt"), function(e) {
-            fs.createReadStream(path.join(pkgPath, '/_upt/mocha_custom/installer_hook.js'))
-                    .pipe(fs.createWriteStream(path.join(mocha, '_upt/installer_hook.js')));
-
-            var exec = require('child_process').exec;
-
-            exec("upt cache clean mocha && \
-                    upt update Hw2/dep/mocha --config.directory=" + config.directory + " --force",
-                    {cwd: config.cwd}, function(error, stdout, stderr) {
-                console.log('updating mocha...');
-
-                if (stderr !== null) {
-                    console.log('' + stderr);
-                }
-
-                if (stdout !== null) {
-                    console.log('' + stdout);
-                }
-                if (error !== null) {
-                    console.log('' + error);
-                }
-
-                callback();
-            });
-        });
-
-
+                                        fs.createReadStream(path.join(pkgPath, '_upt/mocha_custom/installer_hook.js'))
+                                        .pipe(fs.createWriteStream(path.join(mocha_upt, 'installer_hook.js'))
+                                                .on("finish",function() {;
+                                                    callback();
+                                                 })
+                                         )
+                                 })
+                        )
+                })
+        );
     } else {
         callback();
     }

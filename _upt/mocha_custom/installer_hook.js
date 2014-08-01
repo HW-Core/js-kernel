@@ -1,6 +1,6 @@
 var exec = require('child_process').exec;
 
-module.exports = function(action,config,name,pkgPath,newMeta,oldMeta,callback) {
+module.exports = function(action, config, name, pkgPath, newMeta, oldMeta, callback) {
     if (action == "postinstall") {
         console.log('Installing mocha node modules...');
         // using cd instead cwd because it has a strange behavior in this contest
