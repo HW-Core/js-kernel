@@ -1,18 +1,18 @@
 {
-    "name": "Hw2/Js/kernel",
+    "name": "hw2/js/kernel",
     "license": "http://www.hyperweb2.com/terms",
     "dependencies": {
-        "Hw2/dep/jquery": "http://code.jquery.com/jquery-2.1.1.min.js",
-        "Hw2/dep/requirejs/requirejs": "http://requirejs.org/docs/release/2.1.14/minified/require.js"
+        "hw2/dep/jquery": "http://code.jquery.com/jquery-2.1.1.min.js",
+        "hw2/dep/requirejs/requirejs": "http://requirejs.org/docs/release/2.1.14/minified/require.js"
     },
     "_comment_dev_dep": "use files to save space",
     "devDependencies": {
         "%tests": "hw2-core/js-kernel#tests",
-        "Hw2/dep/requirejs/r": "http://requirejs.org/docs/release/2.1.14/r.js",
-        "Hw2/dep/sinon": "http://sinonjs.org/releases/sinon-1.10.3.js",
-        "Hw2/dep/sinon/qunit-plugin": "http://sinonjs.org/releases/sinon-qunit-1.0.0.js",
-        "Hw2/dep/mocha": "https://github.com/visionmedia/mocha.git#1.20.1",
-        "Hw2/dep/chai": "http://chaijs.com/chai.js"
+        "hw2/dep/requirejs/r": "http://requirejs.org/docs/release/2.1.14/r.js",
+        "hw2/dep/sinon": "http://sinonjs.org/releases/sinon-1.10.3.js",
+        "hw2/dep/sinon/qunit-plugin": "http://sinonjs.org/releases/sinon-qunit-1.0.0.js",
+        "hw2/dep/mocha": "https://github.com/visionmedia/mocha.git#1.20.1",
+        "hw2/dep/chai": "http://chaijs.com/chai.js"
     },
     "_comment_keep": "ensure we keep the right git repository configurations",
     "keep": [

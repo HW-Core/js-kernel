@@ -1,5 +1,5 @@
 {
-    "name" : "Hw2/dep/mocha",
+    "name" : "hw2/dep/mocha",
     "_comment_ignore" : "this will replace ignore declared in mocha json",
     "ignore" : [".git"],
     "keep" : [
