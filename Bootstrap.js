@@ -7,7 +7,7 @@ var Hw2 = Hw2 || {}; // namespace
 
 var HW2PATH_SHARE = HW2PATH_ROOT + "share/";
 var HW2PATH_LOCAL = HW2PATH_ROOT + "local/";
-var HW2PATH_JS_LIB = HW2PATH_SHARE + "modules/Hw2/Js/Library/";
+var HW2PATH_JS_LIB = HW2PATH_SHARE + "modules/hw2/modules/js/src/Library/";
 
 document.write("<script src='" + HW2PATH_SHARE + "modules/jquery/jquery/dist/jquery.js'><\/script>");
 
