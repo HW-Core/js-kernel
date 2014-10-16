@@ -1,5 +1,5 @@
 {
-    "name" : "hw2/js/kernel/tests",
+    "name" : "hw2/modules/js/src/kernel/tests",
     "license" : "http://www.hyperweb2.com/terms",
     "_comment_keep" : "ensure we keep the right git repository configurations",
     "keep": [
