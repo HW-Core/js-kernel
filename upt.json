@@ -2,17 +2,15 @@
     "name": "hw2/modules/js/src/kernel",
     "license": "http://www.hyperweb2.com/terms",
     "dependencies": {
-        "hw2/modules/dep/jquery": "http://code.jquery.com/jquery-2.1.1.min.js",
+        "hw2/modules/dep/requirejs/r": "http://requirejs.org/docs/release/2.1.14/r.js",
         "hw2/modules/dep/requirejs/requirejs": "http://requirejs.org/docs/release/2.1.14/minified/require.js"
     },
     "_comment_dev_dep": "use files to save space",
     "devDependencies": {
         "%tests": "hw2-core/js-kernel#tests",
-        "hw2/modules/dep/requirejs/r": "http://requirejs.org/docs/release/2.1.14/r.js",
         "hw2/modules/dep/sinon": "http://sinonjs.org/releases/sinon-1.10.3.js",
-        "hw2/modules/dep/sinon/qunit-plugin": "http://sinonjs.org/releases/sinon-qunit-1.0.0.js",
-        "hw2/modules/dep/jquery-qunit/js": "http://code.jquery.com/qunit/qunit-1.15.0.js",
-        "hw2/modules/dep/jquery-qunit/css": "http://code.jquery.com/qunit/qunit-1.15.0.css"
+        "hw2/modules/dep/mocha": "https://github.com/visionmedia/mocha.git#1.20.1",
+        "hw2/modules/dep/chai": "http://chaijs.com/chai.js"
     },
     "_comment_keep": "ensure we keep the right git repository configurations",
     "keep": [
