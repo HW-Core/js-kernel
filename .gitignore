@@ -79,7 +79,6 @@ local.properties
 #
 
 .htaccess
-tests/
 .upt.json
 
 
