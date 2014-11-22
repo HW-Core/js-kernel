@@ -7,9 +7,13 @@
 define(function(){
     return {
         dep: [  
+            HW2PATH_JS_KERNEL + "Class.js",
+            HW2PATH_JS_KERNEL + "Loader.js"
         ],
         test: [
-            HW2PATH_JS_KERNEL + "tests/tests/bootstrap.js"
+            HW2PATH_JS_KERNEL + "tests/tests/core.js",
+            HW2PATH_JS_KERNEL + "tests/tests/class.js",
+            HW2PATH_JS_KERNEL + "tests/tests/loader.js",
         ]
     };
 });

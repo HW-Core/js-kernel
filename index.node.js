@@ -13,7 +13,9 @@ global.assert = require(HW2PATH_CORE + 'modules/dep/chai/index.js').assert;
 global.mocha = new Mocha({
     ui: 'bdd',
     reporter: 'list',
-    bail: false // do not stop at error
+    bail: false, // do not stop at error
+    //globals: ["$","jQuery"],
+    ignoreLeaks: false
 });
 
 requirejs([listFile],function(testPaths) {

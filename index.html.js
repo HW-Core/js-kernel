@@ -12,7 +12,11 @@ requirejs([
     HW2PATH_CORE + 'modules/dep/mocha/mocha.js'
 ], function (chai) {
     mocha.checkLeaks();
-    mocha.setup('bdd');
+    mocha.setup({
+        ui : 'bdd',
+        //globals: ["$","jQuery"],
+        ignoreLeaks: false
+    });
     assert = chai.assert;
 
     requirejs([listFile], function (list) {
