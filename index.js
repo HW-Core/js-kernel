@@ -10,19 +10,19 @@ HW2PATH_ROOT = typeof HW2PATH_ROOT !== "undefined" ? HW2PATH_ROOT : "../../../..
 
 // convert from relative to absolute
 if (HW2_INBROWSER) {
-    function escapeHTML(s) {
+    function escapeHTML (s) {
         return s.split('&').join('&amp;').split('<').join('&lt;').split('"').join('&quot;');
     }
-    function qualifyURL(url) {
-        var el= document.createElement('div');
-        el.innerHTML= '<a href="'+escapeHTML(url)+'">x</a>';
+    function qualifyURL (url) {
+        var el = document.createElement('div');
+        el.innerHTML = '<a href="' + escapeHTML(url) + '">x</a>';
         return el.firstChild.href;
     }
-    
-    HW2PATH_ROOT=qualifyURL(HW2PATH_ROOT);
+
+    HW2PATH_ROOT = qualifyURL(HW2PATH_ROOT);
 } else {
-    var path=require("path");
-    HW2PATH_ROOT=path.resolve(HW2PATH_ROOT)+"/";
+    var path = require("path");
+    HW2PATH_ROOT = path.resolve(HW2PATH_ROOT) + "/";
 }
 
 HW2PATH_CORE = HW2PATH_ROOT + "hw2/";
@@ -34,8 +34,11 @@ if (HW2_INBROWSER) {
     var requirejs;
 
     function loadKernel () {
-        requirejs = require;
-        requirejs([HW2PATH_JS_KERNEL + "Bootstrap.js"], function (Bootstrap) {
+        requirejs = require.config({
+            context: 'Hw2Core'
+        });
+
+        requirejs([HW2PATH_JS_KERNEL + "Core.js"], function () {
             requirejs([afterScript]);
         });
     }
@@ -59,17 +62,16 @@ if (HW2_INBROWSER) {
     script.src = HW2PATH_CORE + 'modules/dep/requirejs/requirejs/index.js';
     document.currentScript.parentNode.appendChild(script);
 } else {
-    requirejs = require(HW2PATH_CORE + 'modules/dep/requirejs/r/index.js');
-
-    requirejs.config({
+    requirejs = require(HW2PATH_CORE + 'modules/dep/requirejs/r/index.js').config({
         //Pass the top-level main.js/index.js require
         //function to requirejs so that node modules
         //are loaded relative to the top-level JS file.
+        context: 'Hw2Core',
         nodeRequire: require
     });
 
-    global.requirejs=requirejs;
-    global.define=requirejs.define;
+    global.requirejs = requirejs;
+    global.define = requirejs.define;
 
-    module.exports=requirejs(HW2PATH_JS_KERNEL + "Bootstrap.js");
+    module.exports = requirejs(HW2PATH_JS_KERNEL + "Core.js");
 }
