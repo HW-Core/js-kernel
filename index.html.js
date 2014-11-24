@@ -7,6 +7,8 @@ function getParameterByName (name) {
 
 var listFile = getParameterByName("listfile") || "./testList.js";
 
+Hw2Core.I();
+
 requirejs([
     HW2PATH_CORE + 'modules/dep/chai/index.js',
     HW2PATH_CORE + 'modules/dep/mocha/mocha.js'

@@ -6,7 +6,9 @@
 HW2PATH_ROOT = typeof HW2PATH_ROOT !== "undefined" ? HW2PATH_ROOT : "../../../../../../";
 listFile = typeof listFile !== "undefined" ? listFile : "./testList.js";
 
-var Bootstrap = require("../index.js");
+var Hw2Core = require("../index.js");
+
+Hw2Core.I();
 
 var Mocha = require(HW2PATH_CORE + 'modules/dep/mocha/index.js');
 global.assert = require(HW2PATH_CORE + 'modules/dep/chai/index.js').assert;
