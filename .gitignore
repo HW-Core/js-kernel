@@ -81,6 +81,7 @@ local.properties
 .htaccess
 .upt.json
 tests/
+doc/
 
 
 

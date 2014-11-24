@@ -3,7 +3,43 @@
  * GNU General Public License version 3; see www.hyperweb2.com/terms/
  */
 
+
+/*
+ * DEFINES AND LEGACY
+ */ 
+
 HW2_INBROWSER = typeof window !== "undefined";
+
+// ONLY FOR IE8-
+if (!Array.prototype.indexOf) {
+    Array.prototype.indexOf = function(what, i) {
+        i = i || 0;
+        var L = this.length;
+        while (i < L) {
+            if (this[i] === what)
+                return i;
+            ++i;
+        }
+        return -1;
+    };
+}
+
+Function.prototype.bind = function(scope) {
+  var _function = this;
+
+  return function() {
+    return _function.apply(scope, arguments);
+  }
+}
+
+// simple assertion
+if (typeof assert !== 'function') {
+    function assert(condition, message) {
+        if (!condition)
+            throw Error("Assert failed" + (typeof message !== "undefined" ? ": " + message : ""));
+    }
+    ;
+}
 
 // you should define HW2PATH_ROOT in your index.html
 HW2PATH_ROOT = typeof HW2PATH_ROOT !== "undefined" ? HW2PATH_ROOT : "../../../../../";
@@ -29,6 +65,7 @@ HW2PATH_CORE = HW2PATH_ROOT + "hw2/";
 HW2PATH_JS_SRC = HW2PATH_CORE + "modules/js/src/";
 HW2PATH_JS_KERNEL = HW2PATH_JS_SRC + "kernel/";
 HW2PATH_JS_LIB = HW2PATH_JS_SRC + "library/";
+
 
 if (HW2_INBROWSER) {
     var requirejs;

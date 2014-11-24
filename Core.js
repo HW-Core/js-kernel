@@ -4,7 +4,9 @@
  */
 
 define(function () {
-    //Core class
+    /*
+     * Core class
+     */
     return Hw2Core = (function () {
         var cObj = function _Core (callback) {
             requirejs([HW2PATH_JS_KERNEL + 'Loader.js'], function () {
