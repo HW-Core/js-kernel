@@ -22,7 +22,7 @@ define(function () {
         var _runCallback = function (cb) {
             if (typeof cb === "function")
                 cb();
-        }
+        };
 
         public_static.I = function (id, callback) {
             callback = typeof id === "function" && typeof callback === "undefined" ? id : callback;

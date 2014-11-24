@@ -10,8 +10,9 @@ define([
     var $ = Hw2Core;
     return Hw2Core.Loader = $.Class({members: [
             {
-                "name": "load",
-                "val": function (src, callback, sync) {
+                attributes: ["public","static"],
+                name: "load",
+                val: function (src, callback, sync) {
                     try {
                         if (!sync) {
                             requirejs(
