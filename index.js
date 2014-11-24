@@ -80,7 +80,7 @@ if (HW2_INBROWSER) {
         });
     }
 
-    var afterScript = document.currentScript.getAttribute("data-after-boot");
+    var afterScript = document.currentScript.getAttribute("data-after-boot") || HW2_AFTERBOOT;
     var script = document.createElement("script")
     script.type = "text/javascript";
     if (script.readyState) {  //IE

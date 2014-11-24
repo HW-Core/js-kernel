@@ -17,11 +17,11 @@ define(function () {
         /**
          *
          * @param {Object} descriptor elements:
-         * type -> final / abstract modifier 
-         * class -> name of class ( not implemented yet, use var best alternative )
-         * base -> the prototype of parent class
-         * use -> class or classes for code reusing
-         * members -> associative array of members to add
+         * type {Array of Strings / String} -> final / abstract modifier 
+         * class {String} -> name of class ( not implemented yet, use var best alternative )
+         * base {Object} -> the prototype of parent class
+         * use {Object} -> class or classes for code reusing
+         * members {Array of Object} -> associative array of members to add
          * @returns {_Class}
          */
         function _Class (descriptor) {
@@ -174,9 +174,9 @@ define(function () {
                  * @returns
                  */
                 Object.defineProperty(__pub_st, "__", {value: function (name, val, attributes, instance) {
-                        if (val && name.indexOf("__") === 0) {
+                        /*if (val && name.indexOf("__") === 0 && name!=="__constructor") {
                             throw new Error("Members that starts with __ can only be declared internally!");
-                        }
+                        }*/
 
                         return __(name, val, attributes, instance, true);
                     },
