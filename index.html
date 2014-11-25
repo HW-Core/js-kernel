@@ -1,23 +1,50 @@
 <!-- 
  * Copyright (C) 2007 - 2014 Hyperweb2 All rights reserved.
  * GNU General Public License version 3; see www.hyperweb2.com/terms/
- -->
+-->
 <html>
     <head>
         <title>Hw2Core Js-Kernel Documentation</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="styles/index.css">
         <script type="text/javascript">
-            HW2PATH_ROOT="http://hw2-core.github.io/";
-            var head= document.getElementsByTagName('head')[0];
-            var script= document.createElement('script');
-            script.type= 'text/javascript';
-            script.data-after-boot="js/index.html.js"
-            script.src= HW2PATH_ROOT+'hw2/modules/js/src/kernel/index.js';
+            if (document.location.hostname !== "localhost" && document.location.hostname !== "127.0.0.1")
+                HW2PATH_ROOT = "http://hw2-core.github.io/";
+            else // for dev
+                HW2PATH_ROOT = "../../../../../../";
+
+            HW2_AFTERBOOT = "js/index.html.js";
+            var head = document.getElementsByTagName('head')[0];
+            var script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = HW2PATH_ROOT + 'hw2/modules/js/src/kernel/index.js';
             head.appendChild(script);
         </script>
     </head>
     <body>
-        <div>Work in progress...</div>
+        <div id="main">
+            <div id="page">
+                <header>
+                    <img src="https://avatars0.githubusercontent.com/u/6638895?v=3&s=200"/>
+                    <h1><a href="https://hw2-core.github.io">Hw2Core</a> -> 
+                        <a href="https://github.com/hw2-core/js-kernel">JS-Kernel</a> 
+                        Documentation
+                    </h1>
+                </header>
+                <div id="left-menu">
+                    <ul id="left-menu-list">
+                        <li><a id="nav-home" href="#home">Home</a></li>
+                        <li><a id="nav-class" href="#class">Class</a></li>
+                        <li><a id="nav-loader" href="#loader">Loader</a></li>
+                        <li><a id="nav-core" href="#core">Core</a></li>
+                        <li><a id="nav-index" href="#index">Index</a></li>
+                    </ul>
+                </div>
+                <div id="dyn-content">
+                    <noscript><h2>Javascript must be enabled in order to run this application</h2></noscript>
+                </div>
+            </div>
+        </div>
     </body>
 </html>

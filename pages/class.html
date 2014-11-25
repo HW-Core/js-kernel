@@ -1,10 +1,37 @@
 <pre>
-== Class ==
+<span>
+== <a href="https://github.com/hw2-core/js-kernel/blob/master/Class.js">Class</a> ==
 
-==== Examples ====
+It's a full featured module that aims to port the class logic of other OOP 
+languages to javascript.
 
-For files that contain only PHP code, the closing tag ("?>") is never permitted.
-It is not required by PHP, and omitting it´ prevents the accidental 
-injection of trailing white space into the response.
+
+<h3>Current supported features are:</h3>
+<ul>
+    <li>Abstract class: basic support to avoid instantiation</li>
+    <li>Final class: you can't extend a final class or add members dynamically</li>
+    <li>Base: it's the same of "extend" keyword of other langs
+        your object inherits all methods of extended class and they shares
+        prototype that allow you to cast the instanceof succesfully
+    </li>
+    <li>Use: it's the mechanism of traits used also by other languages to  
+        horizontally extends other class. in few words: 
+        you can use methods from other objects. 
+        <subline>It's not fully implemented yet, if you have some issues please
+        report 
+        </subline>
+    </li>
+    <li>Private members</li>
+    <li>Public members</li>
+    <li>Static members</li>
+    <li>Final members</li>
+</ul>
+<h3>Work in progress features:</h3>
+<ul>
+    <li>Protected methods: will be available soon[tm]</li>
+</ul>
+</span>
+
+<h2><a href="https://github.com/hw2-core/js-kernel/blob/tests/tests/class.js">Some class examples</a></h2>
 
 </pre>
