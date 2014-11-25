@@ -15,4 +15,4 @@ Hw2-Core JS is crossplatform and can run on browser and server ( nodejs tested )
 
     upt install hw2-core/js-kernel
 
-#### [>>> documentation <<<](hw2-core.github.io/js-kernel)  ##
+#### [>>> documentation <<<](https://hw2-core.github.io/js-kernel)  ##
