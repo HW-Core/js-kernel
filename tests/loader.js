@@ -14,7 +14,7 @@ describe('Loader', function () {
 
     describe('load', function () {
         it('async load ok', function (done) {
-            loader.load("tests/DummyJsFile", function() { done() });
+            Hw2Core.Loader.load("tests/DummyJsFile", function() { done() });
         });
     });
 });
