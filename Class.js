@@ -4,16 +4,6 @@
  */
 define(function () {
     return Hw2Core.Class = (function () {
-        var lId = 0; // static last id registered
-
-        /**
-         *
-         * @returns {Number} the incremented last id
-         */
-        _Class.incrId = function () {
-            return ++lId;
-        };
-
         /**
          *
          * @param {Object} descriptor elements:
@@ -27,30 +17,57 @@ define(function () {
         function _Class (descriptor) {
             var Obj = (function () {
 
+                var __freeIds = {};
+
+                var __setFreeId = function (id) {
+                    __freeIds[id] = true;
+                };
+
+                var __delFreeId = function (id) {
+                    delete __freeIds[id];
+                };
+
+                var __getFirstFreeId = function () {
+                    for (var id in __freeIds) {
+                        __delFreeId(id);
+                        return id; // if there's a free id return directly
+                    }
+
+                    // otherwise increment the array
+                    return __pvMembers.inst.length;
+                };
+
                 var __pub = _Object.prototype;
                 var __pub_st = _Object;
                 var __pvMembers = {st: {}, inst: []}; // private members
                 var __pendingPvInst = [];
+                var __base = null;
 
                 function _Object () {
-                    if (__pub_st.__isAbstract)
-                        throw new Error('Abstract class may not be constructed');
+                    if (__pub_st.__isAbstract) { 
+                        var caller=arguments.callee.caller;
+                        if (typeof caller["__isClass"]==="undefined" || caller.__getBase() !== __pub_st )
+                            throw new Error('Abstract class may not be constructed');
+                    }
 
                     var obj = Object.create(_Object.prototype);
 
-                    var id = _Class.incrId();
-                    __("__id", id, "public", {enumerable: true}, obj);
-                    __pvMembers.inst[obj.__("__id")] = {};
+                    var id = __getFirstFreeId();
+                    __("__id", id, "public", obj);
+                    __pvMembers.inst[id] = {};
 
-                    for (id in __pendingPvInst) {
-                        var m = __pendingPvInst[id];
+                    for (var prop in __pendingPvInst) {
+                        var m = __pendingPvInst[prop];
                         __(m.name, m.val, m.attributes, obj);
                     }
 
-                    try {
+                    if (typeof obj["__construct"]!=="undefined") {
+                        // also base must be instantiated
+                        if (__base)
+                            obj.__("__parent", new __base(), "private");
+                        
                         // call custom constructor if any
-                        obj.__constructor.apply(this, arguments);
-                    } catch (err) {
+                        obj.__construct.apply(obj, arguments);
                     }
 
                     return obj;
@@ -72,10 +89,9 @@ define(function () {
                     },
                     enumerable: true
                 });
-
-
-                Object.defineProperty(__pub, "__pub_st", {value: function () {
-                        return __pub_st;
+                
+                Object.defineProperty(__pub_st, "__getBase", {value: function (instance) {
+                        return __base;
                     },
                     enumerable: true
                 });
@@ -84,10 +100,38 @@ define(function () {
                  * Destroy the object 
                  * TODO: reorganizing the instance array when it grows up
                  */
-                Object.defineProperty(__pub, "__clean", {value: function () {
-                        delete __pvMembers.inst[__("__id")];
+                Object.defineProperty(__pub, "__destruct", {value: function () {
+                        var id = this.__("__id");
+                        delete __pvMembers.inst[id];
+                        __setFreeId(id);
+
+                        for (var prop in this) { // destroy all object properties
+                            this[prop] = undefined;
+                            delete this[prop];
+                        }
+
+                        this.__proto__ = null;
+
+                        return null;
                     },
                     enumerable: true
+                            //writable: true
+                });
+
+                Object.defineProperty(__pub, "__construct", {value: function () {
+                    },
+                    enumerable: true,
+                    writable: true
+                });
+
+                /**
+                 * expose the static public members to call directly from an instantiated object
+                 */
+                Object.defineProperty(__pub, "__pub_st", {value: function () {
+                        return __pub_st;
+                    },
+                    enumerable: true,
+                    writable: true
                 });
 
                 /**
@@ -153,7 +197,8 @@ define(function () {
                  * public/private
                  * static If no instance provided, this parameter will be forced.
                  * final
-                 * @param {type} noInstance avoid current instance pass to define member in static or prototype instead
+                 * @param {type} noInstance avoid current instance pass to get member from static 
+                 *  or define to prototype if no static attribute exist and value is a function
                  * @returns
                  */
                 Object.defineProperty(__pub, "__", {value: function (name, val, attributes, noInstance) {
@@ -174,9 +219,9 @@ define(function () {
                  * @returns
                  */
                 Object.defineProperty(__pub_st, "__", {value: function (name, val, attributes, instance) {
-                        /*if (val && name.indexOf("__") === 0 && name!=="__constructor") {
-                            throw new Error("Members that starts with __ can only be declared internally!");
-                        }*/
+                        /*if (val && name.indexOf("__") === 0 && name!=="__construct") {
+                         throw new Error("Members that starts with __ can only be declared internally!");
+                         }*/
 
                         return __(name, val, attributes, instance, true);
                     },
@@ -187,7 +232,7 @@ define(function () {
                 var __ = function (name, val, attributes, instance, isPubCall) {
                     var res;
 
-                    if (val) { // set                        
+                    if (typeof val !== "undefined") { // set                        
                         // true if not specified
                         var isPublic = attributes ? attributes.indexOf("private") < 0 : true;
                         // false if not specified
@@ -195,63 +240,67 @@ define(function () {
                         // false if not specified, but if instance is not defined, it's forced to true
                         var isStatic = attributes ? attributes.indexOf("static") >= 0 : false;
 
-                        if (!isPublic && !isStatic && !instance) {
+                        // if it's an instance variable, we've to delegate the definition to the constructor
+                        if (!isStatic
+                                && (typeof val !== "function" || !isPublic)
+                                && !instance) {
                             __pendingPvInst.push({"name": name, "val": val, "attributes": attributes});
                             return;
                         }
 
-                        var obj = isPublic ? // if
-                                (isStatic ? __pub_st : __pub) : // else
-                                (isStatic || name === "__id" ? // if
-                                        __pvMembers.st : // else
-                                        __pvMembers.inst[instance.__("__id")]);
+
+                        if (isPublic) {
+                            if (isStatic) {
+                                obj = __pub_st;
+                            } else if (typeof val === "function") {
+                                obj = __pub;
+                            } else {
+                                obj = instance;
+                            }
+                        } else if (isStatic) {
+                            obj = __pvMembers.st;
+                        } else {
+                            obj = __pvMembers.inst[instance.__("__id")];
+                        }
 
                         // store parent object to apply next
                         var old = obj[name];
 
-                        var tmp = {}, scope = null;
-                        if (typeof val === "function") {
-                            /*
-                             * The first time we assign a value to a function is when we are
-                             * inheriting a "Trait" ( "use" a class ) or just defining the method.
-                             * So if there were another method before , it has been inherited by
-                             * "base" and becomes the __super attribute
-                             */
-                            // define parent method if any
-                            Object.defineProperty(tmp, "__super", {
-                                value: old ? old.bind(obj) : null,
-                                writable: false,
-                                configurable: false,
-                                enumerable: true
-                            });
-                        }
+                        var scope = null;
 
                         res = Object.defineProperty(obj, name, {
                             //__proto__: !isStatic ? obj.__proto__ : obj,
                             value: typeof val === "function" ? function () {
-                                // expose private variable to internal class function
                                 if (!scope) {
+                                    // expose private variable to internal class function
                                     if (!isStatic) {
-                                        var instance = __pvMembers.inst[this.__("__id")];
-                                        scope = instance;
+                                        scope = typeof this.__scope === "undefined" ? this : this.__scope;
+                                        scope.__i = __pvMembers.inst[scope.__("__id")];
+                                        scope.__i.__scope = scope;
+                                    } else {
+                                        scope = typeof obj.__scope === "undefined" ? obj : obj.__scope;
                                     }
 
-                                    // if still we've not scope
-                                    if (!scope) {
-                                        scope = {};
-                                    }
+                                    scope.__s = __pvMembers.st;
+                                    scope.__s.__scope = __pub_st;
 
-                                    scope.__st = __pvMembers.st;
-                                    scope.__super = tmp.__super;
-                                    for (var prop in this) {
-                                        scope[prop] = this[prop];
-                                    }
+                                    // as scope for __super we pass the base class environment
+                                    // TODO: however a check should be done when __super
+                                    // calls a trait method since we need
+                                    // current scope instead
+                                    var sBind = isStatic ? __base : scope.__i.__parent;
+                                    Object.defineProperty(scope, "__super", {
+                                        value: old ? old.bind(sBind) : null,
+                                        writable: true,
+                                        configurable: true,
+                                        enumerable: true
+                                    });
                                 }
 
                                 return val.apply(scope, arguments);
                             } : val,
                             writable: !isFinal,
-                            //configurable: $.inArray("configurable",attributes),
+                            //configurable: attributes.indexOf("configurable"),
                             enumerable: true
                         });
                     } else { // get
@@ -266,38 +315,48 @@ define(function () {
                     return res;
                 };
 
-                return _Object;
-            })();
+                var __inherit = function (src, dest, isBase) {
 
-            var __inherit = function (src, dest, isBase) {
-
-                if (isBase) {
-                    if (src.__isFinal)
-                        throw Error("final class cannot be extended!");
-                    // workaround
-                    dest.prototype.prototype = src.prototype;
-                    dest.prototype.__proto__ = src.prototype;
-                } else {
-                    function extend (destination, source) {
-                        for (var prop in source) {
-                            if (prop.indexOf("__") !== 0 // exclude Class magic methods
-                                    && source.hasOwnProperty(prop) && prop !== "prototype") {
-                                __(prop, source[prop], null, destination);
+                    if (isBase) {
+                        if (src.__isFinal)
+                            throw Error("final class cannot be extended!");
+                        // workaround
+                        dest.prototype.prototype = src.prototype;
+                        dest.prototype.__proto__ = src.prototype;
+                        __base = src;
+                    } else {
+                        function extend (destination, source) {
+                            for (var prop in source) {
+                                if (prop.indexOf("__") !== 0 // exclude Class magic methods
+                                        && source.hasOwnProperty(prop) && prop !== "prototype") {
+                                    __(prop, source[prop], null, destination);
+                                }
                             }
+                        }
+
+                        // traits
+                        if (src instanceof Array) {
+                            src.forEach(function (t) {
+                                extend(dest.prototype, t);
+                            });
+                        } else {
+                            extend(dest.prototype, src);
                         }
                     }
 
-                    // traits
-                    if (src instanceof Array) {
-                        src.forEach(function (t) {
-                            extend(dest.prototype, t);
-                        });
-                    } else {
-                        extend(dest.prototype, src);
-                    }
+                };
+
+                if (descriptor) {
+                    if (descriptor.base)
+                        __inherit(descriptor.base, _Object, true);
+
+                    if (descriptor.use)
+                        __inherit(descriptor.use, _Object, false);
                 }
 
-            };
+
+                return _Object;
+            })();
 
             if (descriptor) {
                 if (descriptor.type && typeof descriptor.type === "string")
@@ -305,12 +364,6 @@ define(function () {
 
                 /*if (typeof descriptor.class === "string")
                  Hw2Core[descriptor.class] = Obj;*/
-
-                if (descriptor.base)
-                    __inherit(descriptor.base, Obj, true);
-
-                if (descriptor.use)
-                    __inherit(descriptor.use, Obj, false);
 
                 if (descriptor.members)
                     Obj.__addMembers(descriptor.members);
