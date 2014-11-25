@@ -63,8 +63,10 @@ define(function () {
 
                     if (typeof obj["__construct"]!=="undefined") {
                         // also base must be instantiated
-                        if (__base)
-                            obj.__("__parent", new __base(), "private");
+                        if (__base) {
+                            var base = Object.create(__base.prototype);
+                            obj.__("__parent", __base.apply(base, arguments), "private");
+                        }
                         
                         // call custom constructor if any
                         obj.__construct.apply(obj, arguments);

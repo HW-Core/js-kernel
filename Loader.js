@@ -10,11 +10,20 @@ define([
     var $ = Hw2Core;
     return Hw2Core.Loader = $.Class({members: [
             {
-                attributes: ["public","static"],
+                /**
+                 * src {String} -> path of resource to load
+                 * options {Object}:
+                 * sync {Boolen} -> load in async/sync mode
+                 * callback {Function}: function to cast as callback
+                 */
+                attributes: ["public", "static"],
                 name: "load",
-                val: function (src, callback, sync) {
+                val: function (src, callback, options) {
+                    options = options || {};
+                    options.sync = options.sync !== undefined ? options.sync : false;
+
                     try {
-                        if (!sync) {
+                        if (!options.sync) {
                             requirejs(
                                     Array.isArray(src) ? src : [src],
                                     typeof callback !== "undefined" ? callback : null
@@ -36,7 +45,7 @@ define([
                                         callback(requirejs(src));
                                     }
                                 } else {
-                                    var res=require(src);
+                                    var res = require(src);
                                     callback(res);
                                     return res;
                                 }
