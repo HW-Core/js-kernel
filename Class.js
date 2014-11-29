@@ -161,11 +161,9 @@ define(function () {
                 /**
                  * expose the static public members to call directly from an instantiated object
                  */
-                Object.defineProperty(__proto, "__st", {value: function () {
-                        return __proto_st;
-                    },
+                Object.defineProperty(__proto, "__st", {
+                    value: __proto_st,
                     enumerable: true,
-                    writable: true
                 });
 
                 /**
