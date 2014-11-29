@@ -8,10 +8,13 @@ Hw2Core.I(function () {
         HW2PATH_JS_LIB + "browser/common/Events.js"
     ], function (Loader) {
         // NAVIGATOR
+        var justLoading=null;
 
         function loadPage (page) {
-            // LOAD MAIN PAGE
-            Loader.load("pages/" + page + ".html", checkNavigation, {selector: "#dyn-content"});
+            if (!justLoading || justLoading!==page) {
+                justLoading=page;
+                Loader.load("pages/" + page + ".html", checkNavigation, {selector: "#dyn-content"});
+            }
         }
 
         function checkNavigation () {
@@ -19,10 +22,14 @@ Hw2Core.I(function () {
                 var pages = ["home", "class", "class-friendly", "class-basic", "loader", "installation"];
 
                 pages.forEach(function (page) {
-                    $.Browser.JQ(".nav-" + page).click(function (e) {
-                        var evt=$.Browser.JQ.data( e, 'events' ).click;
-                        if (!evt)
-                            loadPage(page);
+                    $.Browser.JQ(".nav-" + page).each(function (id,el) {
+                        var element=$.Browser.JQ(el);
+                        var evt = $.Browser.JQ._data(el, 'events');
+                        if (!evt || !evt.click) {
+                            element.click(function (evt) {
+                                loadPage(page);
+                            });
+                        }
                     });
                 });
             });
