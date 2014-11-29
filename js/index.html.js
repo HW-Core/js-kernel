@@ -19,8 +19,9 @@ Hw2Core.I(function () {
                 var pages = ["home", "class", "class-friendly", "class-basic", "loader", "installation"];
 
                 pages.forEach(function (page) {
-                    $.Browser.JQ(".nav-" + page).on("click", function (e) {
-                        loadPage(page);
+                    $.Browser.JQ(".nav-" + page).click(function (e) {
+                        if ($.Browser.JQ.data( e, 'events' ).click.length>0)
+                            loadPage(page);
                     });
                 });
             });
