@@ -20,7 +20,8 @@ Hw2Core.I(function () {
 
                 pages.forEach(function (page) {
                     $.Browser.JQ(".nav-" + page).click(function (e) {
-                        if ($.Browser.JQ.data( e, 'events' ).click.length>0)
+                        var evt=$.Browser.JQ.data( e, 'events' ).click;
+                        if (!evt)
                             loadPage(page);
                     });
                 });
