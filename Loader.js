@@ -5,7 +5,8 @@
 
 //DEPENDENCIES
 define([
-    HW2PATH_JS_KERNEL + "Class.js"
+    HW2PATH_JS_KERNEL + "Class.js",
+    HW2PATH_JS_KERNEL + "syntax.js"
 ], function () {
     var $ = Hw2Core;
     return Hw2Core.Loader = $.Class({members: [

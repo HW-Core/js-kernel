@@ -37,62 +37,96 @@ define(function () {
                     return __pvMembers.inst.length;
                 };
 
-                var __pub = _Object.prototype;
-                var __pub_st = _Object;
-                var __pvMembers = {st: {}, inst: []}; // private members
+                function _pvObject () {
+                    return __constructor(true, arguments);
+                }
+
+                function _Object () {
+                    return __constructor(false, arguments);
+                }
+
+                var __proto = _Object.prototype;
+                var __proto_st = _Object;
+                var __pvMembers = {
+                    st: {self: _pvObject},
+                    inst: []
+                }; // private members
                 var __pendingPvInst = [];
                 var __base = null;
 
-                function _Object () {
-                    if (__pub_st.__isAbstract) { 
-                        var caller=arguments.callee.caller;
-                        if (typeof caller["__isClass"]==="undefined" || caller.__getBase() !== __pub_st )
+                function __constructor (isPvCall, args) {
+                    if (__proto_st.__isAbstract) {
+                        var caller = args.callee.caller.caller;
+                        if (typeof caller["__isClass"] === "undefined" || caller.__getBase() !== __proto_st)
                             throw new Error('Abstract class may not be constructed');
                     }
 
                     var obj = Object.create(_Object.prototype);
 
                     var id = __getFirstFreeId();
-                    __("__id", id, "public", obj);
+                    __("__id", id, "public", null, obj);
                     __pvMembers.inst[id] = {};
 
                     for (var prop in __pendingPvInst) {
                         var m = __pendingPvInst[prop];
-                        __(m.name, m.val, m.attributes, obj);
+                        __(prop, m.val, m.attributes, m.retType, obj);
                     }
 
-                    if (typeof obj["__construct"]!=="undefined") {
+
+                    // check for private constructor
+                    if (!isPvCall && __pvMembers.inst[id]["__construct"] !== undefined)
+                        throw new Error('Class with private constructor may not be instantiated');
+
+                    // this returns constructor and checks about protected accessor
+                    obj.__pvFlag = isPvCall;
+                    var constructor = __("__construct", undefined, null, null, obj);
+                    delete obj.__pvFlag;
+
+                    if (constructor !== undefined) {
+
                         // also base must be instantiated
                         if (__base) {
                             var base = Object.create(__base.prototype);
-                            obj.__("__parent", __base.apply(base, arguments), "private");
+                            obj.__("__parent", __base.apply(base, args), "private");
                         }
-                        
-                        // call custom constructor if any
-                        obj.__construct.apply(obj, arguments);
+
+                        // call constructor
+                        constructor.apply(obj, args);
+                    }
+
+                    if (Obj.__isFinal) {
+                        //Object.preventExtensions(Obj);
+                        Object.seal(obj);
                     }
 
                     return obj;
                 }
+
+                Object.defineProperty(__proto, "__construct", {value: function () {
+                    },
+                    enumerable: true,
+                    writable: true,
+                    configurable: true
+                });
 
                 /**
                  *  Magic methods and properties
                  */
 
                 // dummy method for "duck type" checking
-                Object.defineProperty(__pub, "__isClass", {value: function () {
+                Object.defineProperty(__proto, "__isClass", {value: function () {
                         return true;
                     },
                     enumerable: true
                 });
 
-                Object.defineProperty(__pub_st, "__isClass", {value: function (instance) {
+                Object.defineProperty(__proto_st, "__isClass", {value: function (instance) {
                         return "__isClass" in instance;
                     },
                     enumerable: true
                 });
-                
-                Object.defineProperty(__pub_st, "__getBase", {value: function (instance) {
+
+                Object.defineProperty(__proto_st, "__getBase", {value: function (instance) {
                         return __base;
                     },
                     enumerable: true
@@ -102,7 +136,7 @@ define(function () {
                  * Destroy the object 
                  * TODO: reorganizing the instance array when it grows up
                  */
-                Object.defineProperty(__pub, "__destruct", {value: function () {
+                Object.defineProperty(__proto, "__destruct", {value: function () {
                         var id = this.__("__id");
                         delete __pvMembers.inst[id];
                         __setFreeId(id);
@@ -120,17 +154,11 @@ define(function () {
                             //writable: true
                 });
 
-                Object.defineProperty(__pub, "__construct", {value: function () {
-                    },
-                    enumerable: true,
-                    writable: true
-                });
-
                 /**
                  * expose the static public members to call directly from an instantiated object
                  */
-                Object.defineProperty(__pub, "__pub_st", {value: function () {
-                        return __pub_st;
+                Object.defineProperty(__proto, "__st", {value: function () {
+                        return __proto_st;
                     },
                     enumerable: true,
                     writable: true
@@ -139,14 +167,14 @@ define(function () {
                 /**
                  * Inherit methods from another class ( such as traits )
                  */
-                Object.defineProperty(__pub, "__inherit", {value: function (src) {
+                Object.defineProperty(__proto, "__inherit", {value: function (src) {
                         return __inherit(src, this, false);
                     },
                     enumerable: true
                 });
 
-                Object.defineProperty(__pub, "__addMembers", {value: function (elements) {
-                        __pub_st.__addMembers(elements, this);
+                Object.defineProperty(__proto, "__addMembers", {value: function (elements) {
+                        __proto_st.__addMembers(elements, this, arguments[1]);
                     },
                     enumerable: true
                 });
@@ -157,32 +185,38 @@ define(function () {
                  * @param {type} instance (Optional) can be null if static member
                  * @returns {undefined}
                  */
-                Object.defineProperty(__pub_st, "__addMembers", {value: function (elements, instance) {
+                Object.defineProperty(__proto_st, "__addMembers", {value: function (elements, instance) {
+                        var publicCall = true;
+                        // hidden argument for internal use
+                        if (arguments[2] !== undefined && arguments[2] instanceof __Delegator)
+                            publicCall = false;
+
                         for (var i = 0; i < elements.length; ++i) {
-                            __pub_st.__(
-                                    elements[i]["name"],
+                            __(elements[i]["name"],
                                     elements[i]["val"],
-                                    elements[i]["attributes"]
-                                    , instance);
+                                    elements[i]["attributes"],
+                                    elements[i]["retType"],
+                                    instance,
+                                    publicCall);
                         }
                     },
                     enumerable: true
                 });
 
-                Object.defineProperty(__pub, "__getMembers", {value: function (incStatic) {
-                        return __pub_st.__getMembers(incStatic ? "both" : "instance", this);
+                Object.defineProperty(__proto, "__getMembers", {value: function (incStatic) {
+                        return __proto_st.__getMembers(incStatic ? "both" : "instance", this);
                     },
                     enumerable: true
                 });
 
-                Object.defineProperty(__pub_st, "__getMembers", {value: function (type, instance) {
+                Object.defineProperty(__proto_st, "__getMembers", {value: function (type, instance) {
                         if (type === "static") {
-                            return Object.keys(__pub_st);
+                            return Object.keys(__proto_st);
                         } else if (type === "instance") {
                             return Object.keys(instance);
                         } else {
                             return {
-                                static: Object.keys(__pub_st),
+                                static: Object.keys(__proto_st),
                                 instance: Object.keys(instance)
                             };
                         }
@@ -203,8 +237,8 @@ define(function () {
                  *  or define to prototype if no static attribute exist and value is a function
                  * @returns
                  */
-                Object.defineProperty(__pub, "__", {value: function (name, val, attributes, noInstance) {
-                        return __pub_st.__(name, val, attributes, noInstance ? null : this);
+                Object.defineProperty(__proto, "__", {value: function (name, val, attributes, retType, noInstance) {
+                        return __proto_st.__(name, val, attributes, retType, noInstance ? null : this);
                     },
                     enumerable: true
                 });
@@ -220,44 +254,64 @@ define(function () {
                  * @param {type} instance (Optional) will use instance instead of prototype with non static members
                  * @returns
                  */
-                Object.defineProperty(__pub_st, "__", {value: function (name, val, attributes, instance) {
+                Object.defineProperty(__proto_st, "__", {value: function (name, val, attributes, retType, instance) {
                         /*if (val && name.indexOf("__") === 0 && name!=="__construct") {
                          throw new Error("Members that starts with __ can only be declared internally!");
                          }*/
 
-                        return __(name, val, attributes, instance, true);
+                        return __(name, val, attributes, retType, instance, true);
                     },
                     enumerable: true
                 });
 
                 // private version
-                var __ = function (name, val, attributes, instance, isPubCall) {
+                function __ (name, val, attributes, retType, instance, isPubCall) {
                     var res;
 
                     if (typeof val !== "undefined") { // set                        
-                        // true if not specified
-                        var isPublic = attributes ? attributes.indexOf("private") < 0 : true;
-                        // false if not specified
-                        var isFinal = attributes ? attributes.indexOf("final") >= 0 : false;
+                        if (typeof attributes === "string")
+                            attributes = attributes.split(" ");
+
                         // false if not specified, but if instance is not defined, it's forced to true
                         var isStatic = attributes ? attributes.indexOf("static") >= 0 : false;
 
+                        if (__proto_st.__isStatic && !isStatic) {
+                            throw new SyntaxError("You cannot add non-static members to a static class!");
+                        }
+
+                        var access = "public";
+                        if (attributes) {
+                            access = attributes.indexOf("protected") >= 0 ?
+                                    "protected" :
+                                    (attributes.indexOf("private") >= 0 ?
+                                            "private" : access);
+                        }
+
+                        // false if not specified
+                        var isFinal = attributes ? attributes.indexOf("final") >= 0 : false;
+
                         // if it's an instance variable, we've to delegate the definition to the constructor
                         if (!isStatic
-                                && (typeof val !== "function" || !isPublic)
+                                && access === "private"
                                 && !instance) {
-                            __pendingPvInst.push({"name": name, "val": val, "attributes": attributes});
+
+                            if (access === "private") {
+                                if (isPubCall)
+                                    throw new Error("You cannot define a private member outside of Class!");
+
+                                __pendingPvInst[name] = {"val": val, "attributes": attributes, "retType": retType};
+                            }
+
                             return;
                         }
 
-
-                        if (isPublic) {
+                        if (access === "public" || access == "protected") {
                             if (isStatic) {
-                                obj = __pub_st;
+                                obj = __proto_st;
                             } else if (typeof val === "function") {
-                                obj = __pub;
+                                obj = __proto;
                             } else {
-                                obj = instance;
+                                obj = __proto;
                             }
                         } else if (isStatic) {
                             obj = __pvMembers.st;
@@ -268,54 +322,120 @@ define(function () {
                         // store parent object to apply next
                         var old = obj[name];
 
+                        if (old) {
+                            if (isPubCall && access !== "public") {
+                                throw new Error("You cannot define a private member outside of Class!");
+                            }
+
+                            // check for final members
+                            var descr = Object.getOwnPropertyDescriptor(obj, name)
+                                    || Object.getOwnPropertyDescriptor(obj.prototype, name);
+                            if (descr && descr.set === undefined && descr.writable !== true) {
+                                throw new SyntaxError("Final member cannot be overridden");
+                            }
+                        }
+
                         var scope = null;
 
-                        res = Object.defineProperty(obj, name, {
-                            //__proto__: !isStatic ? obj.__proto__ : obj,
-                            value: typeof val === "function" ? function () {
-                                if (!scope) {
-                                    // expose private variable to internal class function
-                                    if (!isStatic) {
-                                        scope = typeof this.__scope === "undefined" ? this : this.__scope;
-                                        scope.__i = __pvMembers.inst[scope.__("__id")];
-                                        scope.__i.__scope = scope;
-                                    } else {
-                                        scope = typeof obj.__scope === "undefined" ? obj : obj.__scope;
+                        var value = typeof val !== "function" ? val :
+                                function () {
+                                    if (!scope) {
+                                        scope = {};
+
+
+                                        scope.s = __proto_st.__scope === undefined ? __proto_st : __proto_st.__scope;
+
+                                        scope._s = __pvMembers.st;
+
+                                        scope._s.__scope = scope.s;
+
+                                        // expose private variable to internal class function
+                                        if (!isStatic) {
+                                            scope.i = this.__scope === undefined ? this : this.__scope;
+
+                                            // alternative this._i for traits
+                                            scope._i = __pvMembers.inst[scope.i.__("__id")] || this._i;
+
+                                            scope.__scope = scope._i.__scope = scope.i;
+                                        } else {
+                                            scope.__scope = scope.s;
+                                        }
+
+                                        // as scope for __super we pass the base class environment
+                                        // TODO: however a check should be done when __super
+                                        // calls a trait method since we need
+                                        // current scope instead
+                                        var sBind = isStatic ? __base : scope._i.__parent;
+                                        Object.defineProperty(scope, "__super", {
+                                            value: old ? old.bind(sBind) : null,
+                                            writable: true,
+                                            configurable: true,
+                                            enumerable: true
+                                        });
+
+                                        // scope should be immutable
+                                        //Object.freeze(scope);
                                     }
 
-                                    scope.__s = __pvMembers.st;
-                                    scope.__s.__scope = __pub_st;
+                                    if (retType) {
+                                        var res = val.apply(scope, arguments);
 
-                                    // as scope for __super we pass the base class environment
-                                    // TODO: however a check should be done when __super
-                                    // calls a trait method since we need
-                                    // current scope instead
-                                    var sBind = isStatic ? __base : scope.__i.__parent;
-                                    Object.defineProperty(scope, "__super", {
-                                        value: old ? old.bind(sBind) : null,
-                                        writable: true,
-                                        configurable: true,
-                                        enumerable: true
-                                    });
+                                        $.typeCompare(retType, res);
+
+                                        return res;
+                                    } else {
+                                        return val.apply(scope, arguments);
+                                    }
+                                };
+
+                        var descriptors = {
+                            //__proto__: !isStatic ? obj.__proto__ : obj,
+                            //configurable: attributes.indexOf("configurable"),
+                            enumerable: access !== "protected"
+                        };
+
+                        if (access === "protected" || retType) {
+                            descriptors.get = function () {
+                                // check protected
+                                if (access === "protected"
+                                        && this.__scope === undefined
+                                        && this.__pvFlag !== undefined && !this.__pvFlag) {
+                                    throw new Error("Exception trying to retrieve a protected member");
                                 }
 
-                                return val.apply(scope, arguments);
-                            } : val,
-                            writable: !isFinal,
-                            //configurable: attributes.indexOf("configurable"),
-                            enumerable: true
-                        });
+                                if (typeof value !== "function" && retType)
+                                    $.typeCompare(retType, value);
+
+                                return value;
+                            };
+
+                            descriptors.set = function (newVal) {
+                                if (isFinal)
+                                    return;
+
+                                // check protected
+
+                                return value = newVal;
+                            };
+                        } else {
+                            descriptors.value = value;
+                            descriptors.writable = !isFinal;
+                        }
+
+
+                        res = Object.defineProperty(obj, name, descriptors);
                     } else { // get
                         if (!isPubCall) {
                             res = instance ? __pvMembers.inst[instance.__("__id")][name] : __pvMembers.st[name];
                         }
 
                         if (!res)
-                            res = instance ? instance[name] : __pub_st[name];
+                            res = instance ? instance[name] : __proto_st[name];
                     }
 
                     return res;
-                };
+                }
+                ;
 
                 var __inherit = function (src, dest, isBase) {
 
@@ -330,8 +450,8 @@ define(function () {
                         function extend (destination, source) {
                             for (var prop in source) {
                                 if (prop.indexOf("__") !== 0 // exclude Class magic methods
-                                        && source.hasOwnProperty(prop) && prop !== "prototype") {
-                                    __(prop, source[prop], null, destination);
+                                        && prop !== "prototype") {
+                                    __(prop, source[prop], null, null, destination);
                                 }
                             }
                         }
@@ -339,10 +459,12 @@ define(function () {
                         // traits
                         if (src instanceof Array) {
                             src.forEach(function (t) {
-                                extend(dest.prototype, t);
+                                extend(dest, t);
+                                extend(dest.prototype, t.prototype);
                             });
                         } else {
-                            extend(dest.prototype, src);
+                            extend(dest, src);
+                            extend(dest.prototype, src.prototype);
                         }
                     }
 
@@ -360,6 +482,10 @@ define(function () {
                 return _Object;
             })();
 
+            function __Delegator () {
+            }
+
+
             if (descriptor) {
                 if (descriptor.type && typeof descriptor.type === "string")
                     descriptor.type = descriptor.type.split(" ");
@@ -368,7 +494,7 @@ define(function () {
                  Hw2Core[descriptor.class] = Obj;*/
 
                 if (descriptor.members)
-                    Obj.__addMembers(descriptor.members);
+                    Obj.__addMembers(descriptor.members, null, new __Delegator);
 
                 if (descriptor.type) {
                     if (descriptor.type.indexOf("abstract") >= 0)
@@ -379,6 +505,15 @@ define(function () {
                             enumerable: true
                         });
 
+                    if (descriptor.type.indexOf("static") >= 0) {
+                        Object.defineProperty(Obj, "__isStatic", {
+                            value: true,
+                            writable: false,
+                            configurable: false,
+                            enumerable: true
+                        });
+                    }
+
                     if (descriptor.type.indexOf("final") >= 0) {
                         Object.defineProperty(Obj, "__isFinal", {
                             value: true,
@@ -387,7 +522,8 @@ define(function () {
                             enumerable: true
                         });
 
-                        Object.preventExtensions(Obj);
+                        //Object.preventExtensions(Obj);
+                        Object.seal(Obj);
                     }
                 }
             }

@@ -6,13 +6,13 @@
 
 /*
  * DEFINES AND LEGACY
- */ 
+ */
 
 HW2_INBROWSER = typeof window !== "undefined";
 
 // ONLY FOR IE8-
 if (!Array.prototype.indexOf) {
-    Array.prototype.indexOf = function(what, i) {
+    Array.prototype.indexOf = function (what, i) {
         i = i || 0;
         var L = this.length;
         while (i < L) {
@@ -24,17 +24,17 @@ if (!Array.prototype.indexOf) {
     };
 }
 
-Function.prototype.bind = function(scope) {
-  var _function = this;
+Function.prototype.bind = function (scope) {
+    var _function = this;
 
-  return function() {
-    return _function.apply(scope, arguments);
-  }
+    return function () {
+        return _function.apply(scope, arguments);
+    }
 }
 
 // simple assertion
 if (typeof assert !== 'function') {
-    function assert(condition, message) {
+    function assert (condition, message) {
         if (!condition)
             throw Error("Assert failed" + (typeof message !== "undefined" ? ": " + message : ""));
     }
@@ -75,8 +75,12 @@ if (HW2_INBROWSER) {
             context: 'Hw2Core'
         });
 
-        requirejs([HW2PATH_JS_KERNEL + "Core.js"], function () {
-            requirejs([afterScript]);
+        requirejs([HW2PATH_JS_KERNEL + "Core.js"], function (Hw2Core) {
+            if (typeof window[afterScript] === "function") {
+                window[afterScript](Hw2Core);
+            } else {
+                requirejs([afterScript]);
+            }
         });
     }
 
