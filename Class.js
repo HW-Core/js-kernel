@@ -61,6 +61,10 @@ define(function () {
                             throw new Error('Abstract class may not be constructed');
                     }
 
+                    if (__proto_st.__isStatic) {
+                        throw new Error('Static class may not be instantiated');
+                    }
+
                     var obj = Object.create(_Object.prototype);
 
                     var id = __getFirstFreeId();
