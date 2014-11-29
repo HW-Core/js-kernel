@@ -2,6 +2,9 @@
  * Copyright (C) 2007 - 2014 Hyperweb2 All rights reserved.
  * GNU General Public License version 3; see www.hyperweb2.com/terms/
  */
+
+'use strict'
+
 define(function () {
     return Hw2Core.Class = (function () {
         /**
@@ -38,11 +41,11 @@ define(function () {
                 };
 
                 function _pvObject () {
-                    return __constructor(true, arguments);
+                    return __constructor(this, true, arguments);
                 }
 
                 function _Object () {
-                    return __constructor(false, arguments);
+                    return __constructor(this, false, arguments);
                 }
 
                 var __proto = _Object.prototype;
@@ -54,10 +57,9 @@ define(function () {
                 var __pendingPvInst = [];
                 var __base = null;
 
-                function __constructor (isPvCall, args) {
+                function __constructor (scope, isPvCall, args) {
                     if (__proto_st.__isAbstract) {
-                        var caller = args.callee.caller.caller;
-                        if (typeof caller["__isClass"] === "undefined" || caller.__getBase() !== __proto_st)
+                        if (scope.__st["__getBase"] !== undefined && scope.__st.__getBase() !== __proto_st)
                             throw new Error('Abstract class may not be constructed');
                     }
 
@@ -65,7 +67,7 @@ define(function () {
                         throw new Error('Static class may not be instantiated');
                     }
 
-                    var obj = Object.create(_Object.prototype);
+                    var obj = Object.create(__proto);
 
                     var id = __getFirstFreeId();
                     __("__id", id, "public", null, obj);
@@ -90,8 +92,8 @@ define(function () {
 
                         // also base must be instantiated
                         if (__base) {
-                            var base = Object.create(__base.prototype);
-                            obj.__("__parent", __base.apply(base, args), "private");
+                            //var base = Object.create(__base.prototype);
+                            obj.__("__parent", __base.apply(obj, args), "private");
                         }
 
                         // call constructor
@@ -146,7 +148,6 @@ define(function () {
                         __setFreeId(id);
 
                         for (var prop in this) { // destroy all object properties
-                            this[prop] = undefined;
                             delete this[prop];
                         }
 
@@ -307,6 +308,7 @@ define(function () {
                             return;
                         }
 
+                        var obj;
                         if (access === "public" || access == "protected") {
                             if (isStatic) {
                                 obj = __proto_st;
@@ -415,7 +417,10 @@ define(function () {
                                 if (isFinal)
                                     return;
 
-                                // check protected
+                                // check if you're trying to set a new value
+                                // that doesn't respect the typehinting rule
+                                if (typeof value !== "function" && retType)
+                                    $.typeCompare(retType, value);
 
                                 return value = newVal;
                             };
@@ -449,7 +454,7 @@ define(function () {
                         dest.prototype.__proto__ = src.prototype;
                         __base = src;
                     } else {
-                        function extend (destination, source) {
+                        var extend = function (destination, source) {
                             for (var prop in source) {
                                 if (prop.indexOf("__") !== 0 // exclude Class magic methods
                                         && prop !== "prototype") {
@@ -474,14 +479,14 @@ define(function () {
 
                 if (descriptor) {
                     if (descriptor.base)
-                        __inherit(descriptor.base, _Object, true);
+                        __inherit(descriptor.base, __proto_st, true);
 
                     if (descriptor.use)
-                        __inherit(descriptor.use, _Object, false);
+                        __inherit(descriptor.use, __proto_st, false);
                 }
 
 
-                return _Object;
+                return __proto_st;
             })();
 
             function __Delegator () {
