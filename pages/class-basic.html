@@ -1,0 +1,102 @@
+<pre> 
+
+<h3> How to create an abstract class: </h3>
+
+    var FirstName = Hw2Core.Class({
+        <b>// specify class modifiers
+        // it can also be a string separated by spaces: "public abstract"
+        // NOTE: public could also be omitted in this case</b>
+        type: ["public", "abstract"],
+        members: [
+            {
+                name: "firstName",
+                val: "Foo",
+                attributes: "protected"
+            },
+            {
+                name: "getFirstName",
+                val: function () {
+                    return this.i.firstName;
+                },
+                attributes: "public"  <b>// you could omit , public is default</b>
+            }
+        ]});
+
+<h3> How to create a final class: </h3>
+
+    var LastName = Hw2Core.Class({type: "final", members: [
+            {
+                name: "lastName",
+                val: "Bar",
+                attributes: "private"
+            },
+            {
+                name: "getLastName",
+                val: function () {
+                    return this.i.lastName;
+                }
+            },
+            {
+                name: "setLastName",
+                val: function (lName) {
+                    this.i.lastName = lName;
+                }
+            }
+        ]});
+
+<h3> How to create a class that extends "FirstName" and use "LastName": </h3>
+
+    var MyName = Hw2Core.Class({
+        type: "final",
+        base: FirstName,
+        use: LastName, <b>// it can be also an array of classes</b>
+        members: [
+            {
+                name: "nickName",
+                val: "baz",
+                retType: String,  <b>// it's the type-hinting , you can force data-type for this var</b>
+                attributes: ["private", "static"] <b>// you can also use a space-separated string</b>
+            },
+            {
+                name: "__construct",
+                val: function (firstName, lastName, nickName) {
+                    this.i.firstName = firstName;
+                    this.i.setLastName(lastName);
+                    this._s.nickName = nickName;
+                },
+                attributes: "public"
+            },
+            {
+                <b>// override FirstName method to add nickname too</b>
+                name: "getFirstName",
+                val: function () {
+                    return this.__super() + " ( " + this._s.nickName + " )";
+                }
+            },
+            {
+                name: "getNickName",
+                val: function () {
+                    return this._s.nickName;
+                },
+                attributes: ["public", "static"],
+                retType: "string" <b>// you can force a specified data-type to be returned</b>
+            }
+        ]});
+
+    var myName = new MyName("Hello", "World", "I'm a Class");
+
+<b>// you can compare your class instance with its base</b>
+    console.log(myName instanceof FirstName); <b>// true</b>
+
+
+    console.log(myName.getFirstName()); <b>// it prints Hello ( I'm a Class )</b>
+
+    console.log(myName.getLastName()); <b>// it prints "World"</b>
+
+<b>// access to static members from instance using magic method __st</b>
+    console.log(myName.__st.getNickName());  <b>// it prints I'm a Class</b>
+
+<b>// access to static method directly from class name</b>
+    console.log(MyName.getNickName()); <b>// it prints I'm a Class</b>
+
+</pre>

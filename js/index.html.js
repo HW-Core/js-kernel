@@ -8,18 +8,32 @@ Hw2Core.I(function () {
         HW2PATH_JS_LIB + "browser/common/Events.js"
     ], function (Loader) {
         // NAVIGATOR
-        $.Browser.Events.onBodyLoad(function () {
-            var pages = ["home", "class", "loader", "core", "index"];
 
-            pages.forEach(function (page) {
-                $.Browser.JQ("#nav-"+page).on("click", function (e) {
-                    Loader.load("pages/"+page+".html", null, {selector: "#dyn-content"});
+        function loadPage (page) {
+            // LOAD MAIN PAGE
+            Loader.load("pages/" + page + ".html", checkNavigation, {selector: "#dyn-content"});
+        }
+
+        function checkNavigation () {
+            $.Browser.Events.onBodyLoad(function () {
+                var pages = ["home", "class", "class-friendly", "class-basic", "loader", "installation"];
+
+                pages.forEach(function (page) {
+                    $.Browser.JQ(".nav-" + page).on("click", function (e) {
+                        loadPage(page);
+                    });
                 });
             });
+        }
+
+        function getPage () {
+            return new $.Browser.Uri(document.location.href).getFragment() || "home";
+        }
+
+        window.addEventListener("popstate", function (e) {
+            loadPage(getPage());
         });
 
-        var page=$.Browser.Uri.I().getFragment() || "home";
-        // LOAD MAIN PAGE
-        Loader.load("pages/"+page+".html", null, {selector: "#dyn-content"});
+        loadPage(getPage());
     });
 });

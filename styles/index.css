@@ -3,6 +3,13 @@
  * GNU General Public License version 3; see www.hyperweb2.com/terms/
  */
 
+html, body {
+    height: 100%;
+}
+
+#main {
+}
+
 #page > div {
     float: left;
 }
@@ -10,13 +17,18 @@
 #page {
     width: auto;
     margin: 0 auto;
+    min-height: 100%;
+    height: auto !important;
+    height: 100%;
+    margin: 0 auto -70px;
+
 }
 
 #dyn-content {
     padding-left: 50px; 
 }
 
-#left-menu-list > li {
+#left-menu-list li {
     margin: 10px 0;
 }
 
@@ -26,4 +38,8 @@ pre > span {
     white-space: -pre-wrap;      /* Opera 4-6 */
     white-space: -o-pre-wrap;    /* Opera 7 */
     word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}
+
+footer , #clear {
+    clear: both;
 }

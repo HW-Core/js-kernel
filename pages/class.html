@@ -8,8 +8,9 @@ languages to javascript.
 
 <h3>Current supported features are:</h3>
 <ul>
-    <li>Abstract class: basic support to avoid instantiation</li>
-    <li>Final class: you can't extend a final class or add members dynamically</li>
+    <li>Abstract class</li>
+    <li>Final class</li>
+    <li>Static class</li>
     <li>Base: it's the same of "extend" keyword of other langs
         your object inherits all methods of extended class and they shares
         prototype that allow you to cast the instanceof succesfully
@@ -17,21 +18,73 @@ languages to javascript.
     <li>Use: it's the mechanism of traits used also by other languages to  
         horizontally extends other class. in few words: 
         you can use methods from other objects. 
-        <subline>It's not fully implemented yet, if you have some issues please
-        report 
-        </subline>
     </li>
+    
+    
+    <li>Protected members</li>
     <li>Private members</li>
     <li>Public members</li>
+    
     <li>Static members</li>
     <li>Final members</li>
+    <li>Type-hinted members</li>
 </ul>
+
 <h3>Work in progress features:</h3>
 <ul>
-    <li>Protected methods: will be available soon[tm]</li>
+    <li>Abstract methods</li>
+    <li>Interfaces and templates to consider</li>
 </ul>
 </span>
 
-<h2><a href="https://github.com/hw2-core/js-kernel/blob/tests/tests/class.js">Some class examples</a></h2>
+<h3>Get started: </h3>
+
+There are 2 ways to define a class:
+
+<a class="nav-class-basic" href="#class-basic">Basic mode</a> ( faster performance but verbose and a little more complex )
+
+<a class="nav-class-friendly" href="#class-friendly">Friendly mode</a> ( slower performance but less verbose and very friendly )
+
+<h3>Reserved words and "magic" methods</h3>
+
+All magic methods starts with __ prefix, so don't use this prefix for your variables name
+
+<b> Class public instance methods:</b>
+<ul>
+    <li>__isClass</li>
+    <li>__destruct: to destroy the instantiated object</li>
+    <li>__st: to call static methods from an instance</li>
+    <li>__inherit</li>
+    <li>__addMembers</li>
+    <li>__getMembers</li>
+    <li>__</li>
+</ul>
+<b> Class public static methods:</b>
+<ul>
+    <li>__isClass</li>
+    <li>__getBase</li>
+    <li>__addMembers</li>
+    <li>__getMembers</li>
+    <li>__isAbstract</li>
+    <li>__isStatic</li>
+    <li>__isFinal</li>
+    <li>__</li>
+</ul>
+
+<b> Class methods scope reserved variables:</b>
+<ul>
+    <li>this.i : to access public/protected instance members</li>
+    <li>this.s : to access public/protected static members</li>
+    <li>this._i : to access private instance members</li>
+    <li>this._s : to access private static members</li>
+    <li>this.__super : to call parent method</li>
+    <li>this.__scope : the scope of function, internally used</li>
+</ul>
+
+
+<h3><a href="https://github.com/hw2-core/js-kernel/blob/tests/tests/class.js">
+Some class examples can be found in our test module
+</a></h3>
+
 
 </pre>

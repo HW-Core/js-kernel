@@ -1,40 +1,15 @@
 <pre>
-== Kernel ==
+== JS Kernel ==
 
-This is the javascript kernel module for hw2-core ( our extremely modular framework )
+This is the javascript kernel module for hw2-core ( our <b>extremely modular framework</b> )
+
 It is required by all hw2-core js libraries since implements
+
 the bootstrap process and basic functionalities.
 
-Hw2-Core JS is crossplatform and can run on browser and server ( nodejs tested )
 
+<b>Hw2-Core JS is crossplatform and can run on browser and server</b> ( nodejs tested )
 
-<b>to install:</b> <a href="http://github.com/hyperweb2/upt">upt</a> install hw2-core/js-kernel
-
-<b>bootstrap for browser (index.html): </b>
-
-<xmp>
-<html>
-    <head>
-        <title>My Index Page</title>
-        <script type="text/javascript">
-            HW2PATH_ROOT="./"; // url path where "hw2" folder is stored
-        </script>
-        <!-- data-after-boot is an attribute to define a javascript file to run after kernel has been loaded -->
-        <script data-after-boot="index.html.js" src="hw2/modules/js/src/kernel/index.js"></script>
-    </head>
-    <body>
-
-    </body>
-</html>
-</xmp>
-
-<b>bootstrap for nodejs (index.js): </b>
-
-<xmp>
-HW2PATH_ROOT = "./"; // relative/absolute path where hw2 folder is stored
-
-var Hw2Core = require("hw2/modules/js/src/kernel/index.js");
-</xmp>
-
+this project it's in high development state, if you have some issues please <a target="_blank" href="https://github.com/hw2-core/js-kernel/issues">report it</a>
 
 </pre>

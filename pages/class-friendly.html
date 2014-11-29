@@ -1,0 +1,109 @@
+<pre>
+
+    <h3> How to create an abstract class: </h3>
+
+    $ = Hw2Core;
+
+    var LastName = $.public.final.class([
+
+        // short-style using args instead of object when only 
+        // one method is going to be defined
+
+        $.private("lastName", "Bar"),
+
+
+        // if you have multiple members with same accessors
+        // you can define them passing an object
+
+        $.public({
+            getLastName: function () {
+                return this.i.lastName;
+            },
+            setLastName: function (lName) {
+                this.i.lastName = lName;
+            }
+        })
+    ]);
+
+    <h3> How to create a final class: </h3>
+
+    var FirstName = $.public.abstract.class([
+        
+        $.protected({firstName: "Foo"}), <b>// it is visible from this class and its childs</b>
+
+
+        $.public("getFirstName", function () {
+            return this.i.firstName;
+        })
+    ]);
+
+<h3> How to create a class that extends "FirstName" and use "LastName": </h3>
+
+    var MyName = $.public.final.class.extends(FirstName).use(LastName)([
+
+        $.private.static(
+                "nickName", $.typeHint("string", "baz") <b>// it's the type-hinting , you can force data-type for this var</b>
+                ),
+
+
+        $.public({
+            __construct: function (firstName, lastName, nickName) {
+                this.i.firstName = firstName;
+                this.i.setLastName(lastName);
+                this._s.nickName = nickName;
+            },
+
+            <b>// override FirstName method to add nickname too</b>
+            getFirstName: function () {
+                <b>// use magic "__super" to access parent method</b>
+                return this.__super() + " ( " + this._s.nickName + " )";
+            }
+        }),
+
+
+        $.public.static({
+            getNickName: $.typeHint(String, function () { <b>// you can force a specified data-type to be returned</b>
+                return this._s.nickName;
+            })
+        })
+    ]);
+
+    var myName = new MyName("Hello", "World", "I'm a Class");
+
+    <b>// you can compare your class instance with its base</b>
+    console.log(myName instanceof FirstName); // true
+
+
+    console.log(myName.getFirstName()); <b>// it prints Hello ( I'm a Class )</b>
+
+    console.log(myName.getLastName()); <b>// it prints "World"</b>
+
+    <b>// access to static members from instance using magic method __st</b>
+    console.log(myName.__st.getNickName()); <b>// it prints I'm a Class</b>
+
+    <b>// access to static method directly from class name</b>
+    console.log(MyName.getNickName()); <b>// it prints I'm a Class</b>
+
+
+    // Another simple example:
+
+
+    var Expr = $.public.class([
+        $.protected({
+            x: undefined,
+            y: undefined
+        }),
+        $.public("__construct", function (x, y) {
+            this.i.x = x;
+            this.i.y = y;
+        }),
+        $.public.final({
+            sum: $.typeHint(Number, function () {
+                return this.i.x + this.i.y;
+            })
+        })
+    ]);
+
+    console.log(new Expr(2, 2).sum()); // 4
+
+</pre>
