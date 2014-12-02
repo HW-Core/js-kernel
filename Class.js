@@ -14,7 +14,7 @@ hw2.define(function () {
          * type {Array of Strings / String} -> final / abstract modifier 
          * class {String} -> name of class ( not implemented yet, use var best alternative )
          * base {Object} -> the prototype of parent class
-         * use {Object} -> class or classes for code reusing
+         * use {Array} -> class or classes for code reusing
          * members {Array of Object} -> associative array of members to add
          * @returns {_Class}
          */
@@ -94,7 +94,7 @@ hw2.define(function () {
                         // also base must be instantiated
                         if (__base) {
                             //var base = Object.create(__base.prototype);
-                            obj.__("__parent", __base.apply(obj, args), "private");
+                            __("__parent", __base.apply(obj, args), "private", null, obj);
                         }
 
                         // call constructor
@@ -207,21 +207,34 @@ hw2.define(function () {
                     enumerable: true
                 });
 
-                Object.defineProperty(__proto, "__getMembers", {value: function (incStatic) {
+                Object.defineProperty(__proto, "__getMembers", {value: function (incStatic, getPriv) {
                         return __proto_st.__getMembers(incStatic ? "both" : "instance", this);
                     },
                     enumerable: true
                 });
 
-                Object.defineProperty(__proto_st, "__getMembers", {value: function (type, instance) {
-                        if (type === "static") {
-                            return Object.keys(__proto_st);
-                        } else if (type === "instance") {
-                            return Object.keys(instance);
-                        } else {
+                Object.defineProperty(__proto_st, "__getMembers", {value: function (type, instance, getPriv) {
+                        function getPrivate (st) {
+                            return st ? __pvMembers.inst[instance.__("__id")] : __pvMembers.st;
+                        }
+
+                        function getMembers (st, getPriv) {
                             return {
-                                static: Object.keys(__proto_st),
-                                instance: Object.keys(instance)
+                                priv: getPriv ? getPrivate(st) : [],
+                                public: Object.keys(st ? __proto_st : instance)
+                            };
+                        }
+
+
+                        if (type === "static") {
+                            return getMembers(true, getPriv);
+                        } else if (type === "instance") {
+                            return getMembers(false, getPriv);
+                        } else {
+                            // both
+                            return {
+                                static: getMembers(true, getPriv),
+                                instance: getMembers(false, getPriv)
                             };
                         }
                     },
@@ -291,6 +304,11 @@ hw2.define(function () {
                                             "private" : access);
                         }
 
+
+                        if (isPubCall && access !== "public") {
+                            throw new Error("You cannot define a private/protected member outside of Class!");
+                        }
+
                         // false if not specified
                         var isFinal = attributes ? attributes.indexOf("final") >= 0 : false;
 
@@ -306,13 +324,7 @@ hw2.define(function () {
                                 && access === "private"
                                 && !instance) {
 
-                            if (access === "private") {
-                                if (isPubCall)
-                                    throw new Error("You cannot define a private member outside of Class!");
-
-                                __pendingPvInst[name] = {"val": val, "attributes": attributes, "retType": retType};
-                            }
-
+                            __pendingPvInst[name] = {"val": val, "attributes": attributes, "retType": retType};
                             return;
                         }
 
@@ -335,10 +347,6 @@ hw2.define(function () {
                         var old = obj[name];
 
                         if (old) {
-                            if (isPubCall && access !== "public") {
-                                throw new Error("You cannot define a private member outside of Class!");
-                            }
-
                             // check for final members
                             var descr = Object.getOwnPropertyDescriptor(obj, name)
                                     || Object.getOwnPropertyDescriptor(obj.prototype, name);
@@ -469,6 +477,7 @@ hw2.define(function () {
                         dest.prototype.__proto__ = src.prototype;
                         __base = src;
                     } else {
+                        // traits
                         var extend = function (destination, source) {
                             for (var prop in source) {
                                 if (prop.indexOf("__") !== 0 // exclude Class magic methods
@@ -478,7 +487,6 @@ hw2.define(function () {
                             }
                         }
 
-                        // traits
                         if (src instanceof Array) {
                             src.forEach(function (t) {
                                 extend(dest, t);
