@@ -31,7 +31,7 @@ hw2.define([
                         // and remove quotes if any ( you can avoid collision with
                         // when you want check type using a string enclosing
                         // type inside quotes )
-                        retType = this[descr[0]] || descr[0].replace(/["']/g, "");
+                        retType = $[descr[0]] || window[descr[0]] || descr[0].replace(/["']/g, "");
                         // redefine member name without return type
                         name = descr[1];
                     }

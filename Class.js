@@ -297,6 +297,10 @@ hw2.define(function () {
                         // not implemented yet
                         var isAbstract = attributes ? attributes.indexOf("abstract") >= 0 : false;
 
+                        if (isAbstract) {
+                            throw new SyntaxError("abstract is not implemented yet! retry later/soon[tm]");
+                        }
+
                         // if it's an instance variable, we've to delegate the definition to the constructor
                         if (!isStatic
                                 && access === "private"
@@ -405,7 +409,7 @@ hw2.define(function () {
 
                         var descriptors = {
                             //__proto__: !isStatic ? obj.__proto__ : obj,
-                            //configurable: attributes.indexOf("configurable"),
+                            configurable: !isFinal,
                             enumerable: access !== "protected"
                         };
 
