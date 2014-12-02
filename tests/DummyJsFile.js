@@ -3,10 +3,9 @@
  * GNU General Public License version 3; see www.hyperweb2.com/terms/
  */
 
-define(function () {
-with(Hw2Core)
+hw2.define(function () {
     //Core class
-    return Hw2Core.DummyFile = (function () {
+    return this.DummyFile = (function () {
         var cObj = function _DummyFile () {
         };
 

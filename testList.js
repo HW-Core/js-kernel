@@ -4,16 +4,19 @@
  */
 
 // list of test files
-define(function(){
+hw2.exports = function () {
+    var $ = this;
     return {
-        dep: [  
-            HW2PATH_JS_KERNEL + "Class.js",
-            HW2PATH_JS_KERNEL + "Loader.js"
+        dep: [
+            $.const.PATH_JS_KERNEL + "Class.js",
+            $.const.PATH_JS_KERNEL + "syntax.js",
+            $.const.PATH_JS_KERNEL + "Loader.js"
         ],
         test: [
-            HW2PATH_JS_KERNEL + "tests/tests/core.js",
-            HW2PATH_JS_KERNEL + "tests/tests/class.js",
-            HW2PATH_JS_KERNEL + "tests/tests/loader.js",
+            $.const.PATH_JS_KERNEL + "tests/tests/core.js",
+            $.const.PATH_JS_KERNEL + "tests/tests/class.js",
+            $.const.PATH_JS_KERNEL + "tests/tests/loader.js"
         ]
     };
-});
+};
+

@@ -3,18 +3,24 @@
  * GNU General Public License version 3; see www.hyperweb2.com/terms/
  */
 
-describe('Loader', function () {
-    var loader = new Hw2Core.Loader();
+hw2.define(function () {
+    var $ = this;
 
-    describe('new', function () {
-        it('should be created without error', function () {
-            assert.typeOf(loader, "object", "is not an object");
+    describe('Loader', function () {
+        var loader = new $.Loader();
+
+        describe('new', function () {
+            it('should be created without error', function () {
+                assert.typeOf(loader, "object", "is not an object");
+            });
         });
-    });
 
-    describe('load', function () {
-        it('async load ok', function (done) {
-            Hw2Core.Loader.load("tests/DummyJsFile", function() { done() });
+        describe('load', function () {
+            it('async load ok', function (done) {
+                $.Loader.load("tests/DummyJsFile", function () {
+                    done();
+                });
+            });
         });
     });
 });
