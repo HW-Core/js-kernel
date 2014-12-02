@@ -32,7 +32,7 @@ Function.prototype.bind = function (scope) {
     };
 };
 
-var Bootstrap = (function (global) {
+var Bootstrap = (function () {
     var Obj = function _Bootstrap () {
     };
 
@@ -41,12 +41,12 @@ var Bootstrap = (function (global) {
 
     var defRoot = "../../../../../";   // private static 
 
-    var setGlobals = function (skipExtra) {
+    var setGlobals = function (global, skipExtra) {
 //      global namespaced
         global.hw2 = {
             // magic define
             set exports (module) {
-                define([], new hw2.Module(module));
+                this.define([], module);
             },
             Module: function (module) {
                 this.module = module;
@@ -69,8 +69,9 @@ var Bootstrap = (function (global) {
                         throw new SyntaxError("Invalid number of parameters");
                 }
 
-                define.apply(null, args);
-            }
+                this.rdefine.apply(null, args);
+            },
+            rdefine: null
         };
 
         if (!skipExtra) {
@@ -110,7 +111,7 @@ var Bootstrap = (function (global) {
         that = this;
 
         function loadKernel (defines) {
-            setGlobals();
+            setGlobals(window);
 
             var req = requirejs.config({
             });
@@ -149,7 +150,7 @@ var Bootstrap = (function (global) {
         document.currentScript.parentNode.appendChild(script);
     };
 
-    pub.initNode = function (rootPath) {
+    pub.initNode = function (rootPath, callback) {
         var path = require("path");
         rootPath = rootPath || defRoot;
         // convert from relative to absolute
@@ -157,22 +158,19 @@ var Bootstrap = (function (global) {
 
         this.setPaths(rootPath);
 
-        requirejs = require(this.defines.PATH_CORE + 'modules/dep/requirejs/r/index.js').config({
+        var requirejs = require(this.defines.PATH_CORE + 'modules/dep/requirejs/r/index.js').config({
             //Pass the top-level main.js/index.js require
             //function to requirejs so that node modules
             //are loaded relative to the top-level JS file.
             nodeRequire: require
         });
 
-        global.requirejs = requirejs;
-        global.define = requirejs.define;
+        setGlobals(global, true);
 
-        setGlobals(true);
-
-        Hw2Core = requirejs(this.defines.PATH_JS_KERNEL + "Core.js");
+        var Hw2Core = requirejs(this.defines.PATH_JS_KERNEL + "Core.js");
         Hw2Core.const = this.defines;
 
-        return Hw2Core.I(); // export default instance of hw2core
+        return Hw2Core.I(callback); // export default instance of hw2core
     };
 
     pub.init = function () {
@@ -182,14 +180,14 @@ var Bootstrap = (function (global) {
         if (this.defines.IN_BROWSER) {
             this.initBrowser();
         } else {
-            exports = this.initNode;
+            module.exports = this.initNode.bind(this);
         }
     };
 
 
     return Obj;
 
-})(this);
+})();
 
 /**
  * INIT

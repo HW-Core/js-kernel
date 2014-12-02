@@ -11,26 +11,36 @@ define(function () {
     var _Core = function (callback, id) {
         // each instance of core must define its scope
         var scope = {};
-        // expose Core to scope and global hw2 reserved variable
-        window.hw2.Core = scope.Core = pub_static;
+        // expose Core to scope
+        scope.Core = pub_static;
         scope.const = pub_static.const;
         scope.requirejs = requirejs.config({
             paths: {
                 hw2: scope.const.PATH_JS_KERNEL + "requireplg",
                 hw2core: scope.const.PATH_JS_KERNEL + "Core"
             },
-            context: scope
+            context: scope,
+            nodeRequire: scope.const.IN_BROWSER ? undefined : require
         });
 
+        // we could use requirejs flag too
+        // scope.const.IN_BROWSER=requirejs.isBrowser;
+
+        scope.global = scope.const.IN_BROWSER ? window : global;
+        scope.global.hw2.rdefine = define;
 
         scope.requirejs([
             "hw2",
             // we use it also to pass the context for plugin
-            "hw2!" + scope.const.PATH_JS_KERNEL + "Loader.js"], function (reqPlg, Loader) {
-            Loader.load(pub_static.const.PATH_JS_KERNEL + 'syntax.js', function () {
-                callback.apply(scope);
-            });
+            "hw2!" + scope.const.PATH_JS_KERNEL + "Loader.js",
+            "hw2!" + scope.const.PATH_JS_KERNEL + 'syntax.js'
+        ], function (reqPlg, Loader) {
+            callback.apply(scope);
         });
+
+        // a new instance must return 
+        // the created scope, not Core class itself
+        return scope;
     };
 
     var pub = _Core.prototype;
@@ -44,7 +54,6 @@ define(function () {
     };
 
     pub_static.const = {};
-
     pub_static.I = function (id, callback) {
         callback = typeof id === "function" && typeof callback === "undefined" ? id : callback;
         id = typeof id !== "string" ? 0 : id;
