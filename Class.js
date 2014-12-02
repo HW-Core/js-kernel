@@ -3,10 +3,11 @@
  * GNU General Public License version 3; see www.hyperweb2.com/terms/
  */
 
-'use strict'
+'use strict';
 
-define(function () {
-    return Hw2Core.Class = (function () {
+hw2.define(function () {
+    var $ = this;
+    $.Class = (function () {
         /**
          *
          * @param {Object} descriptor elements:
@@ -293,6 +294,9 @@ define(function () {
                         // false if not specified
                         var isFinal = attributes ? attributes.indexOf("final") >= 0 : false;
 
+                        // not implemented yet
+                        var isAbstract = attributes ? attributes.indexOf("abstract") >= 0 : false;
+
                         // if it's an instance variable, we've to delegate the definition to the constructor
                         if (!isStatic
                                 && access === "private"
@@ -335,13 +339,20 @@ define(function () {
                             var descr = Object.getOwnPropertyDescriptor(obj, name)
                                     || Object.getOwnPropertyDescriptor(obj.prototype, name);
                             if (descr && descr.set === undefined && descr.writable !== true) {
-                                throw new SyntaxError("Final member cannot be overridden");
+                                throw new SyntaxError("Final member '" + name + "' cannot be overridden");
                             }
                         }
 
                         var scope = null;
 
-                        var value = typeof val !== "function" ? val :
+                        var value = typeof val !== "function" ?
+                                (function () {
+                                    if (retType)
+                                        $.typeCompare(retType, val);
+
+                                    return val;
+                                })()
+                                :
                                 function () {
                                     if (!scope) {
                                         scope = {};
@@ -541,3 +552,4 @@ define(function () {
         return _Class;
     }());
 });
+

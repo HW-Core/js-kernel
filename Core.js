@@ -3,45 +3,64 @@
  * GNU General Public License version 3; see www.hyperweb2.com/terms/
  */
 
+'use strict';
+/*
+ * Core class
+ */
 define(function () {
-    /*
-     * Core class
-     */
-    return Hw2Core = (function () {
-        var cObj = function _Core (callback) {
-            requirejs([HW2PATH_JS_KERNEL + 'Loader.js'], function () {
-                _runCallback(callback);
+    var _Core = function (callback, id) {
+        // each instance of core must define its scope
+        var scope = {};
+        // expose Core to scope and global hw2 reserved variable
+        window.hw2.Core = scope.Core = pub_static;
+        scope.const = pub_static.const;
+        scope.requirejs = requirejs.config({
+            paths: {
+                hw2: scope.const.PATH_JS_KERNEL + "requireplg",
+                hw2core: scope.const.PATH_JS_KERNEL + "Core"
+            },
+            context: scope
+        });
+
+
+        scope.requirejs([
+            "hw2",
+            // we use it also to pass the context for plugin
+            "hw2!" + scope.const.PATH_JS_KERNEL + "Loader.js"], function (reqPlg, Loader) {
+            Loader.load(pub_static.const.PATH_JS_KERNEL + 'syntax.js', function () {
+                callback.apply(scope);
             });
-        };
+        });
+    };
 
-        var public = cObj.prototype;
-        var public_static = cObj;
+    var pub = _Core.prototype;
+    var pub_static = _Core;
 
-        // private static
-        var _instance = [];
-        var _runCallback = function (cb) {
-            if (typeof cb === "function")
-                cb();
-        };
+    // private static
+    var _instance = [];
+    var _runCallback = function (cb) {
+        if (typeof cb === "function")
+            cb();
+    };
 
-        public_static.I = function (id, callback) {
-            callback = typeof id === "function" && typeof callback === "undefined" ? id : callback;
-            id = typeof id !== "string" ? 0 : id;
+    pub_static.const = {};
 
-            if (typeof _instance[id] === "undefined") {
-                _instance[id] = new cObj(callback);
-            } else {
-                _runCallback(callback);
-            }
+    pub_static.I = function (id, callback) {
+        callback = typeof id === "function" && typeof callback === "undefined" ? id : callback;
+        id = typeof id !== "string" ? 0 : id;
 
-            return _instance[id];
-        };
+        if (typeof _instance[id] === "undefined") {
+            _instance[id] = new _Core(callback, id);
+        } else {
+            _runCallback(callback);
+        }
 
-        public_static.delInstance = function (id) {
-            _instance.splice(id, 1);
-        };
+        return _instance[id];
+    };
 
-        return cObj;
+    pub_static.delInstance = function (id) {
+        _instance.splice(id, 1);
+    };
 
-    })();
+    return pub_static;
 });

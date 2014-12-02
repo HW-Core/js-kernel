@@ -3,19 +3,38 @@
  * GNU General Public License version 3; see www.hyperweb2.com/terms/
  */
 
-define(function () {
-    $ = Hw2Core;
+'use strict';
+
+hw2.define([
+    "hw2!PATH_JS_KERNEL:Class.js"
+], function () {
+    var $ = this;
 
     var mod = (function (modifiers) {
         function buildMembers (members, modifiers) {
             var m = [];
             for (var name in members) {
                 var val, retType;
+                // if member value is type-hinted
+                // it will be processed instead of 
+                // an eventually var name type-hint syntax
                 if (members[name] instanceof $.dType) {
                     retType = members[name].type;
                     val = members[name].value;
                 } else {
+                    var descr = name.split(' ');
                     val = members[name];
+                    if (descr.length > 1) {
+                        // check if retType is an object
+                        // that can be found inside this scope
+                        // otherwise pass the string as is
+                        // and remove quotes if any ( you can avoid collision with
+                        // when you want check type using a string enclosing
+                        // type inside quotes )
+                        retType = this[descr[0]] || descr[0].replace(/["']/g, "");
+                        // redefine member name without return type
+                        name = descr[1];
+                    }
                 }
 
                 m.push({
@@ -29,24 +48,39 @@ define(function () {
             return m;
         }
 
-        var obj = function () {
+        var obj = function _constructor () {
             var members;
 
             switch (arguments.length) {
                 case 1:
+                    // if we've 1 argument
+                    // it must be an object that contains
+                    // various members definitions
                     members = arguments[0];
                     break;
                 case 2:
                     var vname = arguments[0];
+                    // build the object with single definition
                     members = {};
                     members[vname] = arguments[1];
+                    break;
+                case 3:
+                    // when we've 3 arguments, first must
+                    // be the return type
+                    var retType = arguments[0];
+                    var vname = arguments[1];
+                    var val = arguments[2];
+                    // build the object with single definition
+                    members = {};
+                    members[vname] = $.typeHint(retType, val);
                     break;
                 default:
                     throw new SyntaxError("Wrong number of parameters");
             }
 
             if (typeof members !== undefined) {
-                return buildMembers(members, obj.modifiers);
+                // add scope to avoid exception in strict mode
+                return buildMembers.call(this, members, obj.modifiers);
             }
 
             return obj.modifiers;
@@ -274,7 +308,7 @@ define(function () {
 
     $.typeCompare = function (type, val) {
         if (typeof type === "string") {
-            var t = Hw2Core.typeOf(val);
+            var t = $.typeOf(val);
             if (t !== type) {
                 throw new TypeError("Incompatible return type: " + t + " , excepted " + type);
             }
@@ -283,6 +317,5 @@ define(function () {
                 throw new TypeError("Incompatible return type: " + typeof val + " , excepted " + type.name);
             }
         }
-    }
-
+    };
 });
