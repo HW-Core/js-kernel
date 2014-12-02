@@ -36,10 +36,9 @@ and github is not a CDN</i>
         <script type="text/javascript">
             HW2PATH_ROOT="./upt_modules/"; // url path where "hw2" folder is stored
             
-            function myFunction(Hw2Core) {
-                Hw2Core.I(function() {
-                    // you can write your code here
-                });
+            function myFunction() {
+                var Hw2Core=this; // scope of this function
+                // you can write your code here
             }
         </script>
         <!-- data-after-boot is an attribute to define a javascript file or a function to run after kernel has been loaded -->
