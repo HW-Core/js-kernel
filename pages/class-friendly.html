@@ -41,31 +41,36 @@
 <h3> How to create a class that extends "FirstName" and uses "LastName": </h3>
 
     var MyName = $.public.final.class.extends(FirstName).use(LastName)([
+        <b>//$.private("lastName", "Bar"),</b>
 
-        $.private.static(
-                "nickName", $.typeHint("string", "baz") <b>// it's the type-hinting , you can force data-type for this var</b>
-                ),
-
-
+        <b>// multiple member declaration under same public accessor ( C/C++ style )</b>
         $.public({
             __construct: function (firstName, lastName, nickName) {
                 this.i.firstName = firstName;
                 this.i.setLastName(lastName);
                 this._s.nickName = nickName;
             },
-
-            <b>// override FirstName method to add nickname too</b>
+            <b>// override method of "FirstName" class to add nickname too</b>
             getFirstName: function () {
                 <b>// use magic "__super" to access parent method</b>
                 return this.__super() + " ( " + this._s.nickName + " )";
             }
         }),
 
+        <b>// override method of "LastName" trait</b>
+        $.public("getLastName", function () {
+            return "My last name is: " + this.i.lastName;
+        }),
 
-        $.public.static({
-            getNickName: $.typeHint(String, function () { <b>// you can force a specified data-type to be returned</b>
-                return this._s.nickName;
-            })
+        <b>// it's the type-hinting , you can force data-type for this var</b>
+        $.private.static("nickName", $.typeHint("string", "baz")),
+
+        <b>// Another way to define type-hint, compatible with multiple members declaration</b>
+        $.protected.final({"Date birthDay": new Date('December 17,1990 03:24:00')}),
+
+        <b>// Yet Another way to define type-hint using parameters ( only for single-member declaration)</b>
+        $.public.static(String, "getNickName", function () {
+            return this._s.nickName;
         })
     ]);
 
@@ -86,7 +91,7 @@
     console.log(MyName.getNickName()); <b>// it prints I'm a Class</b>
 
 
-    // Another simple example:
+    <h4><b>Another simple example:</b></h4>
 
 
     var Expr = $.public.class([
