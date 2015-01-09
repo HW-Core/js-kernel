@@ -3,7 +3,7 @@
  * GNU General Public License version 3; see www.hyperweb2.com/terms/
  */
 
-hw2.define(function () {
+hw2.exports = function () {
     return (function () {
         var cObj = function _DummyFile () {
         };
@@ -18,4 +18,4 @@ hw2.define(function () {
         return cObj;
 
     })();
-});
+};

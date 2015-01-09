@@ -3,7 +3,7 @@
  * GNU General Public License version 3; see www.hyperweb2.com/terms/
  */
 
-hw2.define(function () {
+hw2.defTests(function () {
     var $ = this;
 
     describe('Loader', function () {
@@ -16,11 +16,34 @@ hw2.define(function () {
         });
 
         describe('load', function () {
-            it('async load ok', function (done) {
-                $.Loader.load("tests/DummyJsFile", function () {
+            it('async load with promise', function (done) {
+                $.Loader.load("tests/DummyJsFile").then(function (D) {
+                    assert.ok(D.hello()==="hello");
                     done();
                 });
             });
+            it('async load with callback', function (done) {
+                $.Loader.load("tests/DummyJsFile2.js", function (D) {
+                    assert.ok(D.hello()==="hello");
+                    done();
+                });
+            });
+
+            it('sync load', function (done) {
+                $.Loader.load("tests/DummyJsFile.js", function () {
+                    var loaded = $.Loader.loadSync("tests/DummyJsFile.js");
+                    if (loaded) {
+                        done();
+                    }
+                });
+            });
+
+            if ($.const.IN_BROWSER) {
+                it('sync load raw', function () {
+                    var loaded = $.Loader.loadSync("tests/DummyJsFile.js", {rawScript: true});
+                    assert.ok(loaded === "tests/DummyJsFile.js");
+                });
+            }
         });
     });
 });

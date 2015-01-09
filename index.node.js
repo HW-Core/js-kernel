@@ -3,12 +3,11 @@
  * GNU General Public License version 3; see www.hyperweb2.com/terms/
  */
 
-HW2PATH_ROOT = typeof HW2PATH_ROOT !== "undefined" ? HW2PATH_ROOT : "../../../../../../";
 listFile = typeof listFile !== "undefined" ? listFile : "./testList.js";
 
 var Hw2Core = require("../index.js");
 
-Hw2Core(HW2PATH_ROOT, function () {
+Hw2Core(function () {
     var $ = this;
 
     var Mocha = require($.const.PATH_CORE + 'modules/dep/mocha/index.js');
@@ -29,7 +28,7 @@ Hw2Core(HW2PATH_ROOT, function () {
             }
 
             // small hack to run define with hw2core mocha tests on node
-            hw2.define = function () {
+            hw2.defTests = function () {
                 switch (arguments.length) {
                     case 1:
                         var def = arguments[0];

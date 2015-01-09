@@ -8,13 +8,9 @@ hw2.exports = function () {
     var $ = this;
     return {
         dep: [
-            $.const.PATH_JS_KERNEL + "Class.js",
-            $.const.PATH_JS_KERNEL + "syntax.js",
-            $.const.PATH_JS_KERNEL + "Loader.js"
         ],
         test: [
             $.const.PATH_JS_KERNEL + "tests/tests/core.js",
-            $.const.PATH_JS_KERNEL + "tests/tests/class.js",
             $.const.PATH_JS_KERNEL + "tests/tests/loader.js"
         ]
     };

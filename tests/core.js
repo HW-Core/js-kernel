@@ -3,7 +3,7 @@
  * GNU General Public License version 3; see www.hyperweb2.com/terms/
  */
 
-hw2.define(function () {
+hw2.defTests(function () {
     var $ = this;
 
     describe('Hw2Core', function () {
