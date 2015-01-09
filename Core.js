@@ -32,8 +32,8 @@ define(function () {
         scope.requirejs([
             "hw2",
             // we use it also to pass the context for plugin
+            "hw2!" + scope.const.PATH_JS_KERNEL + 'utils.js',
             "hw2!" + scope.const.PATH_JS_KERNEL + "Loader.js",
-            "hw2!" + scope.const.PATH_JS_KERNEL + 'syntax.js'
         ], function (reqPlg, Loader) {
             callback.apply(scope);
         });
@@ -48,10 +48,6 @@ define(function () {
 
     // private static
     var _instance = [];
-    var _runCallback = function (cb) {
-        if (typeof cb === "function")
-            cb();
-    };
 
     pub_static.const = {};
     pub_static.I = function (id, callback) {
@@ -59,9 +55,27 @@ define(function () {
         id = typeof id !== "string" ? 0 : id;
 
         if (typeof _instance[id] === "undefined") {
-            _instance[id] = new _Core(callback, id);
+            _instance[id] = {
+                loading: true,
+                inst: new _Core(function () {
+                    _instance[id].loading = false;
+                    if (typeof callback === "function")
+                        callback.apply(this, arguments)
+                }, id)};
         } else {
-            _runCallback(callback);
+            var wait = function () {
+                // if new instance has been commited but not loaded
+                // fully, we must wait before cast the callback
+                if (_instance[id].loading) {
+                    setTimeout(wait, 0); // maybe not the best way?
+                } else {
+                    if (typeof callback === "function") {
+                        callback.apply(_instance[id].inst);
+                    }
+                }
+            };
+
+            wait();
         }
 
         return _instance[id];

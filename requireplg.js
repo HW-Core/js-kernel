@@ -39,9 +39,16 @@ define(function () {
             }
 
             req([name], function (value) {
-                onload(value instanceof hw2.Module ?
-                        value.module.call(config.context) :
-                        value);
+                // small hack
+                if (value && value.__isHw2Module) {
+                    value = value();
+                }
+
+                var res = value instanceof hw2.Module ?
+                        value.module.apply(config.context, value.args) :
+                        value;
+
+                onload(res);
             });
         }
     };

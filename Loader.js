@@ -5,11 +5,29 @@
 
 'use strict';
 
-hw2.exports = function () {
+hw2.define([
+    'hw2!PATH_CORE:modules/dep/q/index.js'
+], function (Q) {
     var $ = this;
+
+    $.Q = Q;
 
     $.Loader = function () {
     };
+
+    // private static
+    function prepare (src, options) {
+        src = Array.isArray(src) ? src : [src];
+
+        if (!options.skipPlg) {
+            for (var i in src) {
+                if (src[i].indexOf("hw2!") !== 0)
+                    src[i] = "hw2!" + src[i];
+            }
+        }
+
+        return src;
+    }
 
     var pub = $.Loader.prototype;
     var pub_static = $.Loader;
@@ -19,58 +37,82 @@ hw2.exports = function () {
     /**
      * 
      * @param {String} src -> path of resource to load
-     * @param {Function} callback -> function to cast as callback
+     * @param {Function} callback -> function to cast as callback, if omitted 
+     * a promise will be returned
      * @param {Object} options :
-     *  {Boolean} sync ->  load in async/sync mode
      *  {Boolean} skipPlg -> skip hw2 plugin
      * @returns {Mixed}
      */
     pub_static.load = function (src, callback, options) {
-        options = options || {sync: false};
-        options.sync = options.sync !== undefined ? options.sync : false;
+        options = options || {};
+        src = prepare(src, options);
 
-        src = Array.isArray(src) ? src : [src];
+        if (!callback) {
+            var deferred = $.Q.defer();
 
-        if (!options.skipPlg) {
-            for (var i in src) {
-                src[i] = "hw2!" + src[i];
-            }
+            $.requirejs(src, function () {
+                deferred.resolve.apply($, arguments);
+            });
+
+            return deferred.promise;
+        } else if (typeof callback === "function") {
+            callback = callback.bind($);
         }
 
-        if (!options.sync) {
-            if (callback !== undefined)
-                callback = callback.bind($);
+        return $.requirejs(src, callback);
+    };
 
-            $.requirejs(src, callback);
-        } else {
-            var loadSync = function (src) {
-                if ($.const.IN_BROWSER) {
-                    var xhrObj = createXMLHTTPObject();
+    /**
+     * 
+     * @param {String} src -> path of resource to load
+     * @param {Object} options :
+     *  {Boolean} skipPlg -> skip hw2 plugin
+     *  {Boolean} rawScript -> put js code in script tag and 
+     *  skip hw2 plugin ( only for browser environment )
+     * @returns {Mixed}
+     */
+    pub_static.loadSync = function (src, options) {
+        options = options || {};
+        options.rawScript && (options.skipPlg = true);
+        src = prepare(src, options);
+
+        var lSync = function (src) {
+            if ($.const.IN_BROWSER) {
+                if (options.rawScript) {
+                    var xhrObj = new XMLHttpRequest();
                     // open and send a synchronous request
                     xhrObj.open('GET', src, false);
                     xhrObj.send('');
-                    // add the returned content to a newly created script tag
                     var se = document.createElement('script');
                     se.type = "text/javascript";
                     se.text = xhrObj.responseText;
                     document.getElementsByTagName('head')[0].appendChild(se);
-                    return requirejs(src);
+                    return src; // should return something
                 } else {
-                    return require(src);
+                    try {
+                        return $.requirejs(src);
+                    } catch (e) {
+                        throw new Error(src + " must be loaded before to reload it async");
+                    }
                 }
-            };
+            } else {
+                return $.requirejs(src);
+            }
+        };
 
 
+        if (src.length > 1) {
             var modules = [];
             for (var i in src) {
-                modules.push(loadSync(src[i]));
+                modules.push(lSync(src[i]));
             }
-
-            callback.apply($, modules);
+            return modules;
+        } else {
+            return lSync(src[0]);
         }
 
     };
 
     return $.Loader;
-};
+});
 
