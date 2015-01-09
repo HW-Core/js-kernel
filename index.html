@@ -9,18 +9,13 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" type="text/css" href="styles/index.css">
         <script type="text/javascript">
-            if (document.location.hostname !== "localhost" && document.location.hostname !== "127.0.0.1")
+            if (document.location.hostname !== "localhost" && document.location.hostname !== "127.0.0.1") {
                 HW2PATH_ROOT = "http://hw2-core.github.io/";
-            else // for dev
+            } else { // for dev
                 HW2PATH_ROOT = "../../../../../../";
-
-            HW2_AFTERBOOT = "js/index.html.js";
-            var head = document.getElementsByTagName('head')[0];
-            var script = document.createElement('script');
-            script.type = 'text/javascript';
-            script.src = HW2PATH_ROOT + 'hw2/modules/js/src/kernel/index.js';
-            head.appendChild(script);
+            }
         </script>
+        <script data-hw2-after-boot="js/index.html.js" src="../index.js"></script>
     </head>
     <body>
         <div id="main">
@@ -36,12 +31,6 @@
                     <ul id="left-menu-list">
                         <li><a class="nav-home" href="#home">Home</a></li>
                         <li><a class="nav-installation" href="#installation">Installation</a></li>
-                        <li><a class="nav-class" href="#class">Class</a>
-                            <ul>
-                                <li><a class="nav-class-basic" href="#class-basic">Class Basic</a></li>
-                                <li><a class="nav-class-friendly" href="#class-friendly">Class Friendly</a></li>
-                            </ul>
-                        </li>
                         <li><a class="nav-loader" href="#loader">Loader</a></li>
                         <li><a target="_blank" href="https://github.com/hw2-core/js-kernel">Repository</a></li>
                     </ul>

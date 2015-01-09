@@ -4,6 +4,7 @@
 
 * <b>requirements for installation ( not for library itself )</b>:
 <a href="http://nodejs.org/">nodejs 0.10.+ ( older not tested )</a>
+
 <a href="http://github.com/hyperweb2/upt">upt 1.4.16+</a>
 
 if you don't have upt, please install it using <a href="https://www.npmjs.org/">npm</a> : 
@@ -15,10 +16,6 @@ execute this command in a terminal ( nodejs cmd on windows ):
 
 <h2><b>If you want just test it without install</b></h2>
 use bootstrap code below changing:
-
-<b>HW2PATH_ROOT="./upt_modules/" -> HW2_PATHROOT="http://hw2-core.github.io/"</b>
-
-and
 
 <b>"upt_modules/hw2/modules/js/src/kernel/index.js" -> "http://hw2-core.github.io/hw2/modules/js/src/kernel/index.js" </b>
 
@@ -34,11 +31,8 @@ and github is not a CDN</i>
     <head>
         <title>My Index Page</title>
         <script type="text/javascript">
-            HW2PATH_ROOT="./upt_modules/"; // url path where "hw2" folder is stored
-            
             function myFunction() {
-                var Hw2Core=this; // scope of this function
-                // you can write your code here
+                // you can write your code here using hw2core features
             }
         </script>
         <!-- data-after-boot is an attribute to define a javascript file or a function to run after kernel has been loaded -->
@@ -53,12 +47,10 @@ and github is not a CDN</i>
 * <b>if you want run it on server, it's the bootstrap for nodejs (index.js): </b>
 
 <xmp>
-HW2PATH_ROOT = "./upt_modules/"; // relative/absolute path where hw2 folder is stored
-
 var Hw2Core = require("upt_modules/hw2/modules/js/src/kernel/index.js");
 
-Hw2Core(HW2PATH_ROOT, function() {
-    // you can write your code here
+Hw2Core(function() {
+    // you can write your code here using hw2core features
 });
 </xmp>
 
