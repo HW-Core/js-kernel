@@ -8,7 +8,7 @@
   "_comment_dev_dep": "use files to save space",
   "devDependencies": {
     "%tests": "hw2-core/js-kernel#tests",
-    "%doc": "hw2-core/js-kernel#doc",
+    "%doc": "hw2-core/js-kernel#gh-pages",
     "hw2/modules/dep/q": "https://raw.githubusercontent.com/kriskowal/q/3159ac47c46cb7e2200191736ca430a011615523/q.js",
     "hw2/modules/dep/sinon": "http://sinonjs.org/releases/sinon-1.10.3.js",
     "hw2/modules/dep/mocha": "https://github.com/visionmedia/mocha.git#1.20.1",
