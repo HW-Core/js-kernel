@@ -36,7 +36,9 @@ hw2.define([
 
     /**
      * 
-     * @param {String} src -> path of resource to load
+     * @param {String} src -> path of resource to load, you can use following format for path:
+     * 1: CONSTANT:path ( where CONSTANT is retrieved from Hw2Core context )
+     * 2: full path
      * @param {Function} callback -> function to cast as callback, if omitted 
      * a promise will be returned
      * @param {Object} options :
@@ -47,19 +49,18 @@ hw2.define([
         options = options || {};
         src = prepare(src, options);
 
-        if (!callback) {
-            var deferred = $.Q.defer();
 
-            $.requirejs(src, function () {
-                deferred.resolve.apply($, arguments);
-            });
+        var deferred = $.Q.defer();
 
-            return deferred.promise;
-        } else if (typeof callback === "function") {
-            callback = callback.bind($);
-        }
+        $.requirejs(src, function () {
+            if (typeof callback === "function") {
+                callback.apply($, arguments);
+            }
 
-        return $.requirejs(src, callback);
+            deferred.resolve.apply($, arguments);
+        });
+
+        return deferred.promise;
     };
 
     /**
