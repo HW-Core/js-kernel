@@ -10,8 +10,8 @@ var Hw2Core = require("../index.js");
 Hw2Core(function () {
     var $ = this;
 
-    var Mocha = require($.const.PATH_CORE + 'modules/dep/mocha/index.js');
-    global.assert = require($.const.PATH_CORE + 'modules/dep/chai/index.js').assert;
+    var Mocha = require($.const.PATH_CORE + 'modules/js/modules/mocha/index.js');
+    global.assert = require($.const.PATH_CORE + 'modules/js/modules/chai/index.js').assert;
     global.mocha = new Mocha({
         ui: 'bdd',
         reporter: 'list',

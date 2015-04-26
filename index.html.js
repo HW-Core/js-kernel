@@ -11,12 +11,12 @@ hw2.exports = function () {
 
     var css = document.createElement('link');
     css.rel = "stylesheet";
-    css.href = $.const.PATH_CORE + 'modules/dep/mocha/mocha.css';
+    css.href = $.const.PATH_CORE + 'modules/js/modules/mocha/mocha.css';
     document.getElementsByTagName('head')[0].appendChild(css);
 
     $.Loader.load([
-        $.const.PATH_CORE + 'modules/dep/chai/index.js',
-        $.const.PATH_CORE + 'modules/dep/mocha/mocha.js'
+        $.const.PATH_CORE + 'modules/js/modules/chai/index.js',
+        $.const.PATH_CORE + 'modules/js/modules/mocha/mocha.js'
     ], function (chai) {
         mocha.checkLeaks();
         mocha.setup({
