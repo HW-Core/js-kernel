@@ -5,7 +5,7 @@
 
 hw2.exports = function () {
     var $ = this;
-    $.Loader.load(["hw2!PATH_JS_LIB:browser/router/Navigation.js"],function(Navigation) {
+    $.Loader.load(["hw2!{PATH_JS_LIB}browser/router/Navigation.js"],function(Navigation) {
         var pages = ["home", "class", "class-friendly", "class-basic", "loader", "installation"];
         var nav = new Navigation(pages);
         nav.init();
