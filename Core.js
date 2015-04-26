@@ -30,11 +30,11 @@ define(function () {
         scope.global.hw2.rdefine = define;
 
         scope.requirejs([
-            "hw2",
+            "hw2", // special path defined above
             // we use it also to pass the context for plugin
             "hw2!" + scope.const.PATH_JS_KERNEL + 'utils.js',
             "hw2!" + scope.const.PATH_JS_KERNEL + "Loader.js",
-        ], function (reqPlg, Loader) {
+        ], function (reqPlg,utils, Loader) {
             callback.apply(scope);
         });
 

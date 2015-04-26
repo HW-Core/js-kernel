@@ -8,7 +8,7 @@ module.exports = function(action, config, name, pkgPath, newMeta, oldMeta, callb
 
         config.cwd = config.cwd || process.cwd();
 
-        var mocha = path.join(config.cwd, config.directory, 'hw2/modules/dep/mocha/');
+        var mocha = path.join(config.cwd, config.directory, 'hw2/modules/js/modules/mocha/');
         var mocha_upt=path.join(mocha, "_upt")
 
         mkdirp.sync(mocha_upt); // create mocha folder + _upt

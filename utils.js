@@ -12,17 +12,35 @@ hw2.define(function () {
         return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
     };
     
-    
-    $.typeCompare = function (type, val) {
+    /**
+     * 
+     * @param {type} type
+     * @param {type} val
+     * @param {type} skipError, if set to true then return a boolean instead throw an error
+     * @returns {undefined}
+     */
+    $.typeCompare = function (type, val,skipError) {
         if (typeof type === "string") {
             var t = $.typeOf(val);
             if (t !== type) {
-                throw new TypeError("Incompatible return type: " + t + " , excepted " + type);
+                if (skipError)
+                    return false;
+                // else
+                throw new TypeError("Incompatible type: " + t + " , excepted " + type);
             }
         } else {
             if (!(val.constructor === type)) {
-                throw new TypeError("Incompatible return type: " + typeof val + " , excepted " + type.name);
+                if (skipError)
+                    return false;
+                // else
+                throw new TypeError("Incompatible type: " + typeof val + " , excepted " + type.name);
             }
         }
+        
+        return true;
+    };
+    
+    $.typeFn = function (/* arguments type, function */) {
+        
     };
 });

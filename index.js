@@ -67,7 +67,7 @@ var Bootstrap = (function () {
 
                         var hw2Module = function () {
                             return new hw2.Module(def, arguments);
-                        }
+                        };
                         hw2Module.__isHw2Module = true;
 
                         args = [hw2Module];
@@ -77,7 +77,7 @@ var Bootstrap = (function () {
 
                         var hw2Module = function () {
                             return new hw2.Module(def, arguments);
-                        }
+                        };
                         hw2Module.__isHw2Module = true;
 
                         args = [arguments[0], hw2Module];
@@ -147,7 +147,6 @@ var Bootstrap = (function () {
                 }
             }();
         }
-        ;
 
         var that = this;
 
@@ -178,7 +177,6 @@ var Bootstrap = (function () {
 
             req([defines.PATH_JS_KERNEL + "Core.js"], function (Hw2Core) {
                 Hw2Core.const = that.defines;
-
                 Hw2Core.I(function () {
                     if (typeof afterScript === "function") {
                         afterScript.call(this);
@@ -207,7 +205,7 @@ var Bootstrap = (function () {
                 };
             }
 
-            script.src = that.defines.PATH_CORE + 'modules/dep/requirejs/requirejs/index.js';
+            script.src = that.defines.PATH_CORE + 'modules/js/modules/requirejs/requirejs/index.js';
             document.currentScript.parentNode.appendChild(script);
         };
 
@@ -226,7 +224,7 @@ var Bootstrap = (function () {
 
         this.setPaths(rootPath);
 
-        var requirejs = require(this.defines.PATH_CORE + 'modules/dep/requirejs/r/index.js').config({
+        var requirejs = require(this.defines.PATH_CORE + 'modules/js/modules/requirejs/r/index.js').config({
             //Pass the top-level main.js/index.js require
             //function to requirejs so that node modules
             //are loaded relative to the top-level JS file.
@@ -240,7 +238,7 @@ var Bootstrap = (function () {
         return Hw2Core.I; // export default instance of hw2core
     };
 
-    pub.init = function () {
+    pub.init = function () {  
         this.defines = {};
         this.defines.IN_BROWSER = typeof window !== "undefined";
 

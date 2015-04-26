@@ -2,17 +2,18 @@
   "name": "hw2/modules/js/src/kernel",
   "license": "http://www.hyperweb2.com/terms",
   "dependencies": {
-    "hw2/modules/dep/requirejs/r": "http://requirejs.org/docs/release/2.1.15/r.js",
-    "hw2/modules/dep/requirejs/requirejs": "http://requirejs.org/docs/release/2.1.15/minified/require.js"
+    "hw2/modules/js/modules/requirejs/r": "http://requirejs.org/docs/release/2.1.15/r.js",
+    "hw2/modules/js/modules/requirejs/requirejs": "http://requirejs.org/docs/release/2.1.15/minified/require.js"
   },
   "_comment_dev_dep": "use files to save space",
   "devDependencies": {
     "%tests": "hw2-core/js-kernel#tests",
     "%doc": "hw2-core/js-kernel#gh-pages",
-    "hw2/modules/dep/q": "https://raw.githubusercontent.com/kriskowal/q/3159ac47c46cb7e2200191736ca430a011615523/q.js",
-    "hw2/modules/dep/sinon": "http://sinonjs.org/releases/sinon-1.10.3.js",
-    "hw2/modules/dep/mocha": "https://github.com/visionmedia/mocha.git#1.20.1",
-    "hw2/modules/dep/chai": "http://chaijs.com/chai.js"
+    "hw2/modules/js/modules/rsvp": "https://raw.githubusercontent.com/components/rsvp.js/d2740bfe52a3a3d63bb132d45490d3126bf0e065/rsvp.js",
+    "hw2/modules/js/modules/weakmap" : "https://raw.githubusercontent.com/Benvie/WeakMap/2693ff73a1650dc7b8beeeb6ce0eba79b53a66af/weakmap.js",
+    "hw2/modules/js/modules/sinon": "http://sinonjs.org/releases/sinon-1.10.3.js",
+    "hw2/modules/js/modules/mocha": "https://github.com/visionmedia/mocha.git#1.20.1",
+    "hw2/modules/js/modules/chai": "http://chaijs.com/chai.js"
   },
   "_comment_keep": "ensure we keep the right git repository configurations",
   "keep": [

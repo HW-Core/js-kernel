@@ -6,11 +6,12 @@
 'use strict';
 
 hw2.define([
-    'hw2!PATH_CORE:modules/dep/q/index.js'
-], function (Q) {
+    'hw2!{PATH_CORE}modules/js/modules/rsvp/index.js'
+], function (RSVP) {
     var $ = this;
 
-    $.Q = Q;
+    $.RSVP = RSVP;
+    $.Promise = $.RSVP.Promise; // alias for rsvp promise
 
     $.Loader = function () {
     };
@@ -49,18 +50,39 @@ hw2.define([
         options = options || {};
         src = prepare(src, options);
 
+        var done;
 
-        var deferred = $.Q.defer();
+        function _load (resolve, reject, callback) {
+            try {
+                $.requirejs(src, function () {
+                    var result = arguments;
+                    if (callback) {
+                        if (typeof callback !== "function")
+                            throw new Error("callback type is: " + typeof (callback));
 
-        $.requirejs(src, function () {
-            if (typeof callback === "function") {
-                callback.apply($, arguments);
+                        callback.apply($, result);
+                    } else {
+                        resolve.apply(null, result);
+                    }
+                }, function (err) {
+                    if (callback) {
+                        throw err;
+                    } else {
+                        reject(err);
+                    }
+                });
+            } catch (e) {
+                if (callback) {
+                    throw new Exception(e);
+                } else {
+                    reject(e);
+                }
             }
+        }
 
-            deferred.resolve.apply($, arguments);
+        return callback && _load(null, null, callback) || new $.Promise(_load)["catch"](function (e) {
+            console.log(e); // this is needed because Async lib is not loaded yet
         });
-
-        return deferred.promise;
     };
 
     /**
