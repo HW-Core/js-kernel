@@ -5,7 +5,7 @@
 * <b>requirements for installation ( not for library itself )</b>:
 <a href="http://nodejs.org/">nodejs 0.10.+ ( older not tested )</a>
 
-<a href="http://github.com/hyperweb2/upt">upt 1.4.16+</a>
+<a href="http://github.com/hyperweb2/upt">upt 1.5.7+</a>
 
 if you don't have upt, please install it using <a href="https://www.npmjs.org/">npm</a> : 
 npm install -g upt ( this command on linux requires to run with root permission )
@@ -21,38 +21,6 @@ use bootstrap code below changing:
 
 <i>please don't use this url for production since it is not stable 
 and github is not a CDN</i>
-
-<h2><b>SAMPLE CODE:</b></h2>
-
-* <b>if you want run it on client, it's the bootstrap for browser (index.html)</b>
-
-<xmp>
-<html>
-    <head>
-        <title>My Index Page</title>
-        <script type="text/javascript">
-            function myFunction() {
-                // you can write your code here using hw2core features
-            }
-        </script>
-        <!-- data-after-boot is an attribute to define a javascript file or a function to run after kernel has been loaded -->
-        <script data-after-boot="myFunction" src="upt_modules/hw2/modules/js/src/kernel/index.js"></script>
-    </head>
-    <body>
-
-    </body>
-</html>
-</xmp>
-
-* <b>if you want run it on server, it's the bootstrap for nodejs (index.js): </b>
-
-<xmp>
-var Hw2Core = require("upt_modules/hw2/modules/js/src/kernel/index.js");
-
-Hw2Core(function() {
-    // you can write your code here using hw2core features
-});
-</xmp>
 
 
 </pre>
