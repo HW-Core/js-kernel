@@ -14,8 +14,15 @@
             } else { // for dev
                 HW2PATH_ROOT = "../../../../../../";
             }
+
+            // we must do it programmatically
+            HW2_AFTERBOOT = "js/index.html.js";
+            var head = document.getElementsByTagName('head')[0];
+            var script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = HW2PATH_ROOT + 'hw2/modules/js/src/kernel/index.js';
+            head.appendChild(script);
         </script>
-        <script data-hw2-after-boot="js/index.html.js" src="../index.js"></script>
     </head>
     <body>
         <div id="main">
@@ -44,7 +51,7 @@
             </div>
             <footer>
                 <small>Copyright by <a target="_blank" href="http://www.hyperweb2.com/terms">Hyperweb2</a>
-                - Documentation created with <a href="https://hw2-core.github.io">Hw2Core</a> framework</small> 
+                    - Documentation created with <a href="https://hw2-core.github.io">Hw2Core</a> framework</small> 
             </footer>
         </div>
     </body>
