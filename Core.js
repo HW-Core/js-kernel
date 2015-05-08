@@ -27,14 +27,42 @@ define(function () {
         // scope.const.IN_BROWSER=requirejs.isBrowser;
 
         scope.global = scope.const.IN_BROWSER ? window : global;
-        scope.global.hw2.rdefine = define;
+        scope.global.hw2.__rdefine = define;
 
         scope.requirejs([
             "hw2", // special path defined above
             // we use it also to pass the context for plugin
             "hw2!" + scope.const.PATH_JS_KERNEL + 'utils.js',
-            "hw2!" + scope.const.PATH_JS_KERNEL + "Loader.js",
-        ], function (reqPlg,utils, Loader) {
+            "hw2!" + scope.const.PATH_JS_KERNEL + "Loader.js"
+        ], function (reqPlg, utils, Loader) {
+            var $ = scope;
+            /**
+             * Alternatives for loading in PHP-style
+             */
+            Object.defineProperty($, "include", {
+                configurable: false,
+                writable: false,
+                value: $.Loader.load
+            });
+
+            Object.defineProperty($, "require", {
+                configurable: false,
+                writable: false,
+                value: $.Loader.load
+            });
+
+            Object.defineProperty($, "includeSync", {
+                configurable: false,
+                writable: false,
+                value: $.Loader.loadSync
+            });
+
+            Object.defineProperty($, "requireSync", {
+                configurable: false,
+                writable: false,
+                value: $.Loader.loadSync
+            });
+
             callback.apply(scope);
         });
 

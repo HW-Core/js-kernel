@@ -47,6 +47,23 @@ var Bootstrap = (function () {
 
     var setGlobals = function (global, skipExtra) {
 //      global namespaced
+
+        var __include = function () {
+            var that = this;
+            var includes = arguments;
+            Array.isArray(arguments[0]) && (includes = arguments[0]);
+
+            var obj = function (module) {
+                return obj.define(module);
+            };
+
+            obj.define = function (module) {
+                return that.define(includes, module);
+            };
+
+            return obj;
+        };
+
         global.hw2 = {
             // magic define
             set exports (module) {
@@ -56,6 +73,9 @@ var Bootstrap = (function () {
                 this.module = def;
                 this.args = args;
             },
+            __includes: [],
+            include: __include,
+            require: __include, // just an alias of include for now
             /**
              * requirejs alias
              */
@@ -86,14 +106,17 @@ var Bootstrap = (function () {
                         throw new SyntaxError("Invalid number of parameters");
                 }
 
-                this.rdefine.apply(null, args);
+                this.__rdefine.apply(null, args);
             },
+            init: null,
+            /*
+             * Internal used
+             */
             // will be defined next
-            rdefine: null,
-            init: null
+            __rdefine: null
         };
-        
-        hw2.defTests=hw2.define; // special use for tests
+
+        hw2.defTests = hw2.define; // special use for tests
 
         if (!skipExtra) {
 //      in environments without module system
@@ -153,11 +176,11 @@ var Bootstrap = (function () {
         var currScript = this.getCurrentScriptTag() || {};
 
         var rootPath = currScript["data-hw2-path-root"] ||
-                window["HW2PATH_ROOT"] ||
-                function () {
-                    var prefix = currScript.src ? that.dirName(currScript.src) + "/" : null;
-                    return prefix + defRoot;
-                }();
+            window["HW2PATH_ROOT"] ||
+            function () {
+                var prefix = currScript.src ? that.dirName(currScript.src) + "/" : null;
+                return prefix + defRoot;
+            }();
 
         rootPath = this.qualifyURL(rootPath);
 
@@ -167,7 +190,7 @@ var Bootstrap = (function () {
         // or using global const , otherwise the init process must be done manually later
         // via hw2.init(myAfterScript);
         var afterScript = (currScript["getAttribute"] && currScript.getAttribute(abAttr))
-                || window["HW2_AFTERBOOT"] || false;
+            || window["HW2_AFTERBOOT"] || false;
 
         setGlobals(window);
 
@@ -238,7 +261,7 @@ var Bootstrap = (function () {
         return Hw2Core.I; // export default instance of hw2core
     };
 
-    pub.init = function () {  
+    pub.init = function () {
         this.defines = {};
         this.defines.IN_BROWSER = typeof window !== "undefined";
 
@@ -274,20 +297,20 @@ var Bootstrap = (function () {
 
     pub.getCurrentScriptTag = function () {
         return document.currentScript || // the fatest way if running on modern and compatible browser
-                function () {
-                    // most browsers , but you need to specify hw2-after-boot in script tag
-                    return document.querySelector('script[' + abAttr + ']');
-                }() ||
-                (function () {
-                    // if you need to avoid afterBoot to manually run it and keep compatibility with oldest browser
-                    // you can add an id attribute  to your tag
-                    return document.querySelector('script[' + idAttr + ']');
-                }()) ||
-                (function () {
-                    // alternative if not custom data attributes specified, but not always secure/works
-                    return document.querySelector('script[src*="hw2/modules/js/src/kernel/index.js"]');
-                }()) ||
-                null;
+            function () {
+                // most browsers , but you need to specify hw2-after-boot in script tag
+                return document.querySelector('script[' + abAttr + ']');
+            }() ||
+            (function () {
+                // if you need to avoid afterBoot to manually run it and keep compatibility with oldest browser
+                // you can add an id attribute  to your tag
+                return document.querySelector('script[' + idAttr + ']');
+            }()) ||
+            (function () {
+                // alternative if not custom data attributes specified, but not always secure/works
+                return document.querySelector('script[src*="hw2/modules/js/src/kernel/index.js"]');
+            }()) ||
+            null;
     };
 
     return Obj;

@@ -10,10 +10,7 @@ hw2.define([
 ], function (RSVP) {
     var $ = this;
 
-    $.RSVP = RSVP;
-    $.Promise = $.RSVP.Promise; // alias for rsvp promise
-
-    $.Loader = function () {
+    var Loader = function () {
     };
 
     // private static
@@ -30,8 +27,8 @@ hw2.define([
         return src;
     }
 
-    var pub = $.Loader.prototype;
-    var pub_static = $.Loader;
+    var pub = Loader.prototype;
+    var pub_static = Loader;
 
     pub_static.paths = {};
 
@@ -135,6 +132,24 @@ hw2.define([
         }
 
     };
+    
+    Object.defineProperty($,"RSVP",{
+        configurable: false,
+        writable: false,
+        value: RSVP
+    });
+    
+    Object.defineProperty($,"Promise",{
+        configurable: false,
+        writable: false,
+        value: RSVP.Promise
+    });
+    
+    Object.defineProperty($,"Loader",{
+        configurable: false,
+        writable: false,
+        value: Loader
+    });
 
     return $.Loader;
 });
