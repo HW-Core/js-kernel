@@ -20,7 +20,7 @@ hw2.include([
             init: function () {
                 var that = this;
                 this.__super().then(function () {
-                    var pages = ["home", "loader", "installation","getting-started","how-to-create-a-module"];
+                    var pages = ["home", "loader", "installation", "getting-started", "how-to-create-a-module"];
 
                     for (i in pages) {
                         that.i.getRouter().setRoute(".nav-" + pages[i], {component: pages[i]});
@@ -31,10 +31,19 @@ hw2.include([
             build: function () {
                 this.__super();
 
+                var oldPages = {
+                    "class": "http://hw2-core.github.io/js-library-class/#!home"
+                };
+
                 var comp = this.i.getRouter().getRouteInfo().getComponent();
                 var page = comp || "home";
 
-                $.Browser.Loader.load("pages/" + page + ".html", null, {selector: "#dyn-content"});
+                // redirect old pages
+                if (oldPages[page]) {
+                    this.i.getRouter().navigateByUrl(oldPages[page], true);
+                } else {
+                    $.Browser.Loader.load("pages/" + page + ".html", null, {selector: "#dyn-content"});
+                }
             }
         }),
         $.private({
