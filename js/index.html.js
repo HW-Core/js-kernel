@@ -1,6 +1,6 @@
-hw2.include([
-    "hw2!{PATH_JS_LIB}browser/application/Component.js",
-    "hw2!{PATH_JS_LIB}browser/application/System.js"
+hwc.include([
+    "hwc!{PATH_JS_LIB}browser/application/Component.js",
+    "hwc!{PATH_JS_LIB}browser/application/System.js"
 ]).define(function () {
     var $ = this;
 
@@ -32,7 +32,7 @@ hw2.include([
                 this.__super();
 
                 var oldPages = {
-                    "class": "http://hw2-core.github.io/js-library-class/#!home"
+                    "class": "http://hw-core.github.io/js-library-class/#!home"
                 };
 
                 var comp = this.i.getRouter().getRouteInfo().getComponent();

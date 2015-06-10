@@ -1,8 +1,8 @@
 {
-    "name" : "hw2/modules/js/src/kernel/doc",
+    "name" : "hwcore/modulesjs/src/kernel/doc",
     "license" : "http://www.hyperweb2.com/terms",
     "dependencies": {
-        "%kernel": "hw2-core/js-kernel"
+        "%kernel": "hw-core/js-kernel"
     },
     "_comment_keep" : "ensure we keep the right git repository configurations",
     "keep": [
