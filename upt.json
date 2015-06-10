@@ -1,5 +1,5 @@
 {
-    "name": "hwcore/modulesjs/src/kernel/tests",
+    "name": "hwcore/modules/js/src/kernel/tests",
     "license": "http://www.hyperweb2.com/terms",
     "dependencies": {
         "%kernel": "hw-core/js-kernel"
