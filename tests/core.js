@@ -3,10 +3,10 @@
  * GNU General Public License version 3; see www.hyperweb2.com/terms/
  */
 
-hw2.defTests(function () {
+hwc.defTests(function () {
     var $ = this;
 
-    describe('Hw2Core', function () {
+    describe('HWCore', function () {
         describe('.I()', function () {
             it('should create the instance', function () {
                 $.Core.I();

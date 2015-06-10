@@ -5,9 +5,9 @@
 
 listFile = typeof listFile !== "undefined" ? listFile : "./testList.js";
 
-var Hw2Core = require("../index.js");
+var HWCore = require("../index.js");
 
-Hw2Core(function () {
+HWCore(function () {
     var $ = this;
 
     var Mocha = require($.const.PATH_CORE + 'modules/js/modules/mocha/index.js');
@@ -16,7 +16,7 @@ Hw2Core(function () {
         ui: 'bdd',
         reporter: 'list',
         bail: false, // do not stop at error
-        globals: ["hw2", "jQuery"],
+        globals: ["hwc", "jQuery"],
         ignoreLeaks: false
     });
 
@@ -27,8 +27,8 @@ Hw2Core(function () {
                 mocha.addFile(testPaths.test[id]);
             }
 
-            // small hack to run define with hw2core mocha tests on node
-            hw2.defTests = function () {
+            // small hack to run define with hw-core mocha tests on node
+            hwc.defTests = function () {
                 switch (arguments.length) {
                     case 1:
                         var def = arguments[0];

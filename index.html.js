@@ -1,4 +1,4 @@
-hw2.exports = function () {
+hwc.exports = function () {
     var $ = this;
     function getParameterByName (name) {
         name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");

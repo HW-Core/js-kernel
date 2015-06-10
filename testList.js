@@ -4,7 +4,7 @@
  */
 
 // list of test files
-hw2.exports = function () {
+hwc.exports = function () {
     var $ = this;
     return {
         dep: [
