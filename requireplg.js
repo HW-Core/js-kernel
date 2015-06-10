@@ -52,7 +52,7 @@ define(function () {
                     value = value();
                 }
 
-                var res = value instanceof hw2.Module ?
+                var res = value instanceof hwc.Module ?
                         value.module.apply(config.context, value.args) :
                         value;
 

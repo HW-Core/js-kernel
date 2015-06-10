@@ -1,8 +1,3 @@
-/*
- * Copyright (C) 2007 - 2014 Hyperweb2 All rights reserved.
- * GNU General Public License version 3; see www.hyperweb2.com/terms/
- */
-
 'use strict';
 /*
  * Core class
@@ -16,8 +11,8 @@ define(function () {
         scope.const = pub_static.const;
         scope.requirejs = requirejs.config({
             paths: {
-                hw2: scope.const.PATH_JS_KERNEL + "requireplg",
-                hw2core: scope.const.PATH_JS_KERNEL + "Core"
+                hwc: scope.const.PATH_JS_KERNEL + "requireplg",
+                hcore: scope.const.PATH_JS_KERNEL + "Core"
             },
             context: scope,
             nodeRequire: scope.const.IN_BROWSER ? undefined : require
@@ -27,13 +22,14 @@ define(function () {
         // scope.const.IN_BROWSER=requirejs.isBrowser;
 
         scope.global = scope.const.IN_BROWSER ? window : global;
-        scope.global.hw2.__rdefine = define;
+        scope.global.hwc.__core = scope;
+        scope.global.hwc.__rdefine = define;
 
         scope.requirejs([
-            "hw2", // special path defined above
+            "hwc", // special path defined above
             // we use it also to pass the context for plugin
-            "hw2!" + scope.const.PATH_JS_KERNEL + 'utils.js',
-            "hw2!" + scope.const.PATH_JS_KERNEL + "Loader.js"
+            "hwc!" + scope.const.PATH_JS_KERNEL + 'utils.js',
+            "hwc!" + scope.const.PATH_JS_KERNEL + "Loader.js"
         ], function (reqPlg, utils, Loader) {
             var $ = scope;
             /**

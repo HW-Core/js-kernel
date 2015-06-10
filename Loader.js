@@ -5,8 +5,8 @@
 
 'use strict';
 
-hw2.define([
-    'hw2!{PATH_CORE}modules/js/modules/rsvp/index.js'
+hwc.define([
+    'hwc!{PATH_CORE}modules/js/modules/rsvp/index.js'
 ], function (RSVP) {
     var $ = this;
 
@@ -19,8 +19,8 @@ hw2.define([
 
         if (!options.skipPlg) {
             for (var i in src) {
-                if (src[i].indexOf("hw2!") !== 0)
-                    src[i] = "hw2!" + src[i];
+                if (src[i].indexOf("hwc!") !== 0)
+                    src[i] = "hwc!" + src[i];
             }
         }
 
@@ -35,12 +35,12 @@ hw2.define([
     /**
      * 
      * @param {String} src -> path of resource to load, you can use following format for path:
-     * 1: CONSTANT:path ( where CONSTANT is retrieved from Hw2Core context )
+     * 1: CONSTANT:path ( where CONSTANT is retrieved from HWCore context )
      * 2: full path
      * @param {Function} callback -> function to cast as callback, if omitted 
      * a promise will be returned
      * @param {Object} options :
-     *  {Boolean} skipPlg -> skip hw2 plugin
+     *  {Boolean} skipPlg -> skip hwc plugin
      * @returns {Mixed}
      */
     pub_static.load = function (src, callback, options) {
@@ -78,7 +78,7 @@ hw2.define([
         }
 
         return callback && _load(null, null, callback) || new $.Promise(_load)["catch"](function (e) {
-            console.log(e); // this is needed because Async lib is not loaded yet
+            console.error(e); // this is needed because Async lib is not loaded yet
         });
     };
 
@@ -86,9 +86,9 @@ hw2.define([
      * 
      * @param {String} src -> path of resource to load
      * @param {Object} options :
-     *  {Boolean} skipPlg -> skip hw2 plugin
+     *  {Boolean} skipPlg -> skip hwc plugin
      *  {Boolean} rawScript -> put js code in script tag and 
-     *  skip hw2 plugin ( only for browser environment )
+     *  skip hwc plugin ( only for browser environment )
      * @returns {Mixed}
      */
     pub_static.loadSync = function (src, options) {

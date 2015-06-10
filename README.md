@@ -1,18 +1,18 @@
-HW2CORE - JS KERNEL
+HWCORE - JS KERNEL
 ===========
 
 == Kernel ==
 
-This is the kernel module of hw2-core for javascript
-It is required by all hw2-core js libraries since implements
+This is the kernel module of hw-core for javascript
+It is required by all hw-core js libraries since implements
 the bootstrap process and basic functionalities.
 
-Hw2-Core JS is crossplatform and can run on browser and server ( nodejs tested )
+HW-Core JS is crossplatform and can run on browser and server ( nodejs tested )
 
 
 **Install using our [upt](https://github.com/hyperweb2/upt) package manager:**
  
 
-    upt install hw2-core/js-kernel
+    upt install hw-core/js-kernel
 
-#### [>>> documentation <<<](https://hw2-core.github.io/js-kernel)  ##
+#### [>>> documentation <<<](https://hw-core.github.io/js-kernel)  ##

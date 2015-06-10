@@ -5,7 +5,7 @@
 
 'use strict';
 
-hw2.define(function () {
+hwc.define(function () {
     var $ = this;
 
     // property getter that walks in chain

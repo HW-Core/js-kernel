@@ -1,8 +1,3 @@
-/*
- * Copyright (C) 2007 - 2014 Hyperweb2 All rights reserved.
- * GNU General Public License version 3; see www.hyperweb2.com/terms/
- */
-
 'use strict';
 
 /*
@@ -41,9 +36,15 @@ var Bootstrap = (function () {
     var pub = Obj.prototype;
     var pub_static = Obj;
 
-    var defRoot = "../../../../../";   // private static 
-    var abAttr = "data-hw2-after-boot"; // after boot attribute name
-    var idAttr = "data-hw2-core-id";
+    var defRoot = "../../../../../";   // private static
+    /**
+     * 
+     * Data attributes
+     */
+    var abAttr = "data-hwc-after-boot"; // after boot attribute name
+    var rootPathAttr = "data-hwc-path-root";
+    var autoAttr = "data-hwc-auto-init";
+    var manualAttr = "data-hwc-manual-init";
 
     var setGlobals = function (global, skipExtra) {
 //      global namespaced
@@ -64,7 +65,7 @@ var Bootstrap = (function () {
             return obj;
         };
 
-        global.hw2 = {
+        global.hwc = {
             // magic define
             set exports (module) {
                 this.define([], module);
@@ -73,34 +74,50 @@ var Bootstrap = (function () {
                 this.module = def;
                 this.args = args;
             },
-            __includes: [],
+            __pendingDefines: [],
+            __pendingFunc: [],
             include: __include,
             require: __include, // just an alias of include for now
             /**
              * requirejs alias
              */
             define: function () {
+                // if hwc has not been initialized yet, we must defer the module loading
+                var scripts = document.getElementsByTagName('script');
+                var lastScript = scripts[scripts.length - 1];
+
+                if (!lastScript.src) {
+                    // this is the case of modules defined inside a <script> tag
+                    // without using a file
+                    this.defineFn.apply(this, arguments);
+
+                    return;
+                } else if (!this.__rdefine) {
+                    this.__pendingDefines.push(lastScript.src);
+                    return;
+                }
+
                 var args;
                 switch (arguments.length) {
                     case 1:
                         var def = arguments[0];
 
-                        var hw2Module = function () {
-                            return new hw2.Module(def, arguments);
+                        var hwcModule = function () {
+                            return new hwc.Module(def, arguments);
                         };
-                        hw2Module.__isHw2Module = true;
+                        hwcModule.__isHw2Module = true;
 
-                        args = [hw2Module];
+                        args = [hwcModule];
                         break;
                     case 2:
                         var def = arguments[1];
 
-                        var hw2Module = function () {
-                            return new hw2.Module(def, arguments);
+                        var hwcModule = function () {
+                            return new hwc.Module(def, arguments);
                         };
-                        hw2Module.__isHw2Module = true;
+                        hwcModule.__isHw2Module = true;
 
-                        args = [arguments[0], hw2Module];
+                        args = [arguments[0], hwcModule];
                         break;
                     default:
                         throw new SyntaxError("Invalid number of parameters");
@@ -108,21 +125,50 @@ var Bootstrap = (function () {
 
                 this.__rdefine.apply(null, args);
             },
+            getPendingDefines: function () {
+                return this.__pendingDefines;
+            },
+            getPendingFunc: function () {
+                return this.__pendingFunc;
+            },
+            defineFn: function () {
+                if (!this.__rdefine) {
+                    this.__pendingFunc.push(arguments);
+                } else {
+                    switch (arguments.length) {
+                        case 1:
+                            arguments[0].call(this.__core);
+                            break;
+                        case 2:
+                            var inc = arguments[0];
+                            var def = arguments[1];
+                            var that = this;
+                            this.__core.Loader.load(inc)
+                                .then(function () {
+                                    def.call(that.__core);
+                                });
+                            break;
+                        default:
+                            throw new SyntaxError("Invalid number of parameters");
+                    }
+                }
+            },
             init: null,
             /*
              * Internal used
              */
             // will be defined next
-            __rdefine: null
+            __rdefine: null,
+            __core: null
         };
 
-        hw2.defTests = hw2.define; // special use for tests
+        hwc.defTests = hwc.define; // special use for tests
 
         if (!skipExtra) {
 //      in environments without module system
             try {
                 global.module = {};
-                global.exports = global.module.exports = global.hw2.exports;
+                global.exports = global.module.exports = global.hwc.exports;
             } catch (e) {
                 // nothing to do  
             }
@@ -132,7 +178,7 @@ var Bootstrap = (function () {
 
     pub.setPaths = function (root) {
         this.defines.PATH_ROOT = root;
-        this.defines.PATH_CORE = root + "hw2/";
+        this.defines.PATH_CORE = root + "hwcore/";
         this.defines.PATH_JS_SRC = this.defines.PATH_CORE + "modules/js/src/";
         this.defines.PATH_JS_KERNEL = this.defines.PATH_JS_SRC + "kernel/";
         this.defines.PATH_JS_LIB = this.defines.PATH_JS_SRC + "library/";
@@ -175,7 +221,7 @@ var Bootstrap = (function () {
 
         var currScript = this.getCurrentScriptTag() || {};
 
-        var rootPath = currScript["data-hw2-path-root"] ||
+        var rootPath = currScript[rootPathAttr] ||
             window["HW2PATH_ROOT"] ||
             function () {
                 var prefix = currScript.src ? that.dirName(currScript.src) + "/" : null;
@@ -188,7 +234,7 @@ var Bootstrap = (function () {
 
         // afterScript can be defined by script custom data attribute ( priority and suggested )
         // or using global const , otherwise the init process must be done manually later
-        // via hw2.init(myAfterScript);
+        // via hwc.init(myAfterScript);
         var afterScript = (currScript["getAttribute"] && currScript.getAttribute(abAttr))
             || window["HW2_AFTERBOOT"] || false;
 
@@ -198,16 +244,32 @@ var Bootstrap = (function () {
             var req = requirejs.config({
             });
 
-            req([defines.PATH_JS_KERNEL + "Core.js"], function (Hw2Core) {
-                Hw2Core.const = that.defines;
-                Hw2Core.I(function () {
-                    if (typeof afterScript === "function") {
-                        afterScript.call(this);
-                    } else if (typeof window[afterScript] === "function") {
-                        window[afterScript].call(this);
-                    } else {
-                        this.Loader.load(afterScript);
-                    }
+            req([defines.PATH_JS_KERNEL + "Core.js"], function (HWCore) {
+                HWCore.const = that.defines;
+                HWCore.I(function () {
+                    var $ = this;
+                    // this allows to load all modules defined before hw-core initialization
+                    $.Loader.load($.global.hwc.getPendingDefines()).then(function () {
+                        try {
+                            if (afterScript) {
+                                if (typeof afterScript === "function") {
+                                    return afterScript.call($);
+                                } else if (typeof window[afterScript] === "function") {
+                                    return window[afterScript].call($);
+                                } else {
+                                    return $.Loader.load(afterScript);
+                                }
+                            }
+                        } catch (e) {
+                            console.log(e.stack);
+                        }
+                    }).then(function () {
+                        // run pending functions
+                        var defs = $.global.hwc.getPendingFunc();
+                        defs.forEach(function (args) {
+                            $.global.hwc.defineFn.apply($.global.hwc, args);
+                        });
+                    });
                 });
             });
         }
@@ -232,10 +294,12 @@ var Bootstrap = (function () {
             document.currentScript.parentNode.appendChild(script);
         };
 
-        if (afterScript) {
+        // by default hwcore always init automatically
+        // except if manual-attribute is used
+        if (!currScript[manualAttr]) {
             init(afterScript);
         } else {
-            window.hw2.init = init;
+            window.hwc.init = init;
         }
     };
 
@@ -256,9 +320,9 @@ var Bootstrap = (function () {
 
         setGlobals(global, true);
 
-        var Hw2Core = requirejs(this.defines.PATH_JS_KERNEL + "Core.js");
-        Hw2Core.const = this.defines;
-        return Hw2Core.I; // export default instance of hw2core
+        var HWCore = requirejs(this.defines.PATH_JS_KERNEL + "Core.js");
+        HWCore.const = this.defines;
+        return HWCore.I; // export default instance of hw-core
     };
 
     pub.init = function () {
@@ -298,17 +362,17 @@ var Bootstrap = (function () {
     pub.getCurrentScriptTag = function () {
         return document.currentScript || // the fatest way if running on modern and compatible browser
             function () {
-                // most browsers , but you need to specify hw2-after-boot in script tag
+                // most browsers , but you need to specify hwc-after-boot in script tag
                 return document.querySelector('script[' + abAttr + ']');
             }() ||
             (function () {
                 // if you need to avoid afterBoot to manually run it and keep compatibility with oldest browser
                 // you can add an id attribute  to your tag
-                return document.querySelector('script[' + idAttr + ']');
+                return document.querySelector('script[' + autoAttr + ']') || document.querySelector('script[' + manualAttr + ']');
             }()) ||
             (function () {
                 // alternative if not custom data attributes specified, but not always secure/works
-                return document.querySelector('script[src*="hw2/modules/js/src/kernel/index.js"]');
+                return document.querySelector('script[src*="hwcore/modules/js/src/kernel/index.js"]');
             }()) ||
             null;
     };

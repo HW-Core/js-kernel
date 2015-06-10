@@ -1,5 +1,5 @@
 {
-    "name" : "hw2/modules/js/modules/mocha",
+    "name" : "hwcore/modulesjs/modules/mocha",
     "_comment_ignore" : "this will replace ignore declared in mocha json",
     "ignore" : [".git"],
     "keep" : [
