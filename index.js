@@ -158,7 +158,7 @@ var HwcBootstrap = (function () {
             return this.__pendingFunc;
         },
         defineFn: function () {
-            if (!this.__core.Loader) {
+            if (!this.__core || !this.__core.Loader) {
                 this.__pendingFunc.push(arguments);
             } else {
                 switch (arguments.length) {
