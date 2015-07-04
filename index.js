@@ -180,12 +180,20 @@ var HwcBootstrap = (function () {
             }
         },
         I: function () {
+            return this.__core.I();
+        },
+        getCoreClass: function () {
             return this.__core;
         },
         isInBrowser: function () {
             return typeof window !== "undefined";
         },
-        init: null,
+        /**
+         * will be override on node and when manually init
+         */
+        init: function () {
+            console.error("Cannot init! Is Core automatically initialized?");
+        },
         /*
          * Internal used
          */
@@ -310,6 +318,10 @@ var HwcBootstrap = (function () {
             });
         }
 
+        /**
+         * 
+         * @param {function|string} afterScript : can be a path, a function name or a function
+         */
         var init = function (afterScript) {
             var script = document.createElement("script");
             script.type = "text/javascript";
@@ -335,7 +347,15 @@ var HwcBootstrap = (function () {
         if (!currScript[manualAttr]) {
             init(afterScript);
         } else {
-            window.hwc.init = init;
+            /**
+             * 
+             * @param {function|string} afterScript : can be a path, a function name or a function
+             * @returns window.hwc
+             */
+            window.hwc.init = function (afterScript) {
+                init(afterScript);
+                return window.hwc;
+            };
         }
     };
 
@@ -360,7 +380,13 @@ var HwcBootstrap = (function () {
 
         var HWCore = requirejs(this.defines.PATH_JS_KERNEL + "Core.js");
         HWCore.const = global.hwc.const = this.defines;
-        return HWCore.I; // export default instance of hw-core
+        // export global hwc namespace
+        // you can use .I() to instantiate then
+        global.hwc.init = function (callback) {
+            HWCore.I(callback);
+            return global.hwc;
+        };
+        return global.hwc;
     };
 
     pub.init = function () {
