@@ -5,9 +5,9 @@
 
 listFile = typeof listFile !== "undefined" ? listFile : "./testList.js";
 
-var HWCore = require("../index.js");
+hwc = require("../index.js").init();
 
-HWCore(function () {
+hwc.init(function () {
     var $ = this;
 
     var Mocha = require($.const.PATH_CORE + 'modules/js/modules/mocha/index.js');
