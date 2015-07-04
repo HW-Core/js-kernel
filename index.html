@@ -6,17 +6,17 @@
         <link rel="stylesheet" type="text/css" href="styles/index.css">
         <script type="text/javascript">
             if (document.location.hostname !== "localhost" && document.location.hostname !== "127.0.0.1") {
-                HW2PATH_ROOT = "http://hw-core.github.io/";
+                HWCPATH_ROOT = "http://hw-core.github.io/";
             } else { // for dev
-                HW2PATH_ROOT = "../../../../../../";
+                HWCPATH_ROOT = "../../../../../../";
             }
 
             // we must do it programmatically
-            HW2_AFTERBOOT = "js/index.html.js";
+            HWC_AFTERBOOT = "js/index.html.js";
             var head = document.getElementsByTagName('head')[0];
             var script = document.createElement('script');
             script.type = 'text/javascript';
-            script.src = HW2PATH_ROOT + 'hwcore/modules/js/src/kernel/index.js';
+            script.src = HWCPATH_ROOT + 'hwcore/modules/js/src/kernel/index.js';
             head.appendChild(script);
         </script>
     </head>
