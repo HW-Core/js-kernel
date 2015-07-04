@@ -48,7 +48,7 @@ define(function () {
 
             req([name], function (value) {
                 // small hack
-                if (value && value.__isHw2Module) {
+                if (value && value.__isHwcModule) {
                     value = value();
                 }
 

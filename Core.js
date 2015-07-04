@@ -32,6 +32,7 @@ define(function () {
             "hwc!" + scope.const.PATH_JS_KERNEL + "Loader.js"
         ], function (reqPlg, utils, Loader) {
             var $ = scope;
+
             /**
              * Alternatives for loading in PHP-style
              */
@@ -57,6 +58,12 @@ define(function () {
                 configurable: false,
                 writable: false,
                 value: $.Loader.loadSync
+            });
+
+            // run pending
+            var defs = scope.global.hwc.getPendingFunc();
+            defs.forEach(function (args) {
+                scope.global.hwc.defineFn.apply(scope.global.hwc, args);
             });
 
             callback.apply(scope);
