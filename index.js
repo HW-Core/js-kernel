@@ -171,7 +171,7 @@ var HwcBootstrap = (function () {
                         var that = this;
                         this.__core.Loader.load(inc)
                             .then(function () {
-                                def.call(that.__core);
+                                def.apply(that.__core, arguments);
                             });
                         break;
                     default:
