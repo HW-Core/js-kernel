@@ -17,7 +17,7 @@ Using data-hwc-after-boot
             }
         </script>
         <!-- data-after-boot is an attribute to define a javascript file or a function to run after kernel has been loaded -->
-        <script data-after-boot="myFunction" src="upt_modules/hwcore/modules/js/src/kernel/index.js"></script>
+        <script data-hwc-after-boot="myFunction" src="upt_modules/hwcore/modules/js/src/kernel/index.js"></script>
     </head>
     <body>
 
@@ -28,9 +28,9 @@ Using data-hwc-after-boot
 * <b>if you want run it on server, it's the bootstrap for nodejs (index.js): </b>
 
 <xmp>
-var HWCore = require("upt_modules/hwcore/modules/js/src/kernel/index.js");
+var hwc = require("upt_modules/hwcore/modules/js/src/kernel/index.js");
 
-HWCore(function() {
+hwc.init(function() {
     // you can write your code here using hw-core features
 });
 </xmp>
