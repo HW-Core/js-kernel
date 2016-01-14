@@ -1,0 +1,10 @@
+[submodule "tests"]
+	path = tests
+	url = https://github.com/HW-Core/js-kernel.git
+	branch = tests
+	update = none
+[submodule "doc"]
+	path = doc
+	url = https://github.com/HW-Core/js-kernel.git
+	branch = gh-pages
+	update = none
