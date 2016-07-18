@@ -11,14 +11,13 @@ function add_repo() {
     path=$DIR/$basedir/$name
     
     (git --git-dir=$path/.git/ rev-parse && git --git-dir=$path/.git/ pull origin $branch) || git clone $url/$name.git -b $branch $path 
-	[ -f $DIR/$3/$1/install.sh ] && bash $path/install.sh $params
+	[ -f $path/install.sh ] && bash $path/install.sh $params
 }
 
 function add_file() {
     mkdir -p $2
-    wget -nc $1 -P $2
+    wget -nc $1 -P $DIR/$2
 }
-
 
 #
 # ADD DEPENDENCIES
