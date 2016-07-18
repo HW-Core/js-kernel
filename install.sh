@@ -16,7 +16,7 @@ function add_repo() {
 
 function add_file() {
     mkdir -p $2
-    wget -nc $1 -P $DIR/$2
+    [ ! -e $path/.git/ ] && curl -o $DIR/$2 $1
 }
 
 #
