@@ -15,9 +15,10 @@ function add_repo() {
 }
 
 function add_file() {
-    mkdir -p "$(dirname $2)"
-    [ ! -e $path/.git/ ] && curl -o $DIR/$2 $1
+    mkdir -p $DIR/"$(dirname $2)"
+    [ ! -e $DIR/$2 ] && curl -o $DIR/$2 $1
 }
+
 
 #
 # ADD DEPENDENCIES
