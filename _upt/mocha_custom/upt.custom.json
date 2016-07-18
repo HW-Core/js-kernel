@@ -1,9 +1,0 @@
-{
-    "name" : "hwcore/modules/js/modules/mocha",
-    "_comment_ignore" : "this will replace ignore declared in mocha json",
-    "ignore" : [".git"],
-    "keep" : [
-        "_upt",
-        "node_modules"
-    ]
-}
