@@ -23,8 +23,6 @@ function add_file() {
 # ADD DEPENDENCIES
 #
 
-add_repo "git@github.com:HW-Core/" "js-kernel" "master" "../"
-
 mod_path="../js-modules/"
 add_file "http://requirejs.org/docs/release/2.1.15/r.js" $mod_path"/requirejs/r/index.js"
 add_file "http://requirejs.org/docs/release/2.1.15/minified/require.js" $mod_path"/requirejs/requirejs/index.js"
