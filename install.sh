@@ -15,7 +15,7 @@ Joiner:add_file "https://raw.githubusercontent.com/components/rsvp.js/d2740bfe52
 Joiner:add_file "https://raw.githubusercontent.com/Benvie/WeakMap/2693ff73a1650dc7b8beeeb6ce0eba79b53a66af/weakmap.js" $mod_path"/weakmap/index.js"
 
 if [[ $1 == "dev" ]]; then
-    Joiner:add_repo "https://github.com/mochajs" "mocha" "1.20.1" $mod_path
+    Joiner:add_repo "https://github.com/mochajs/mocha" "mocha" "1.20.1" $mod_path
     
     Joiner:add_file "http://sinonjs.org/releases/sinon-1.10.3.js" $mod_path"/sinon/index.js"
     Joiner:add_file "http://chaijs.com/chai.js" $mod_path"/chai/index.js"
