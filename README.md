@@ -10,7 +10,7 @@ the bootstrap process and basic functionalities.
 HW-Core JS is crossplatform and can run on browser and server ( nodejs tested )
 
 
-**How to install ( run in bash >= 4.x )**
+**How to install ( For all Platform / OS : run in bash >= 4.x )**
 
     repo="hw-core/js-kernel"; git clone https://github.com/$repo.git $repo; ./$repo/install.sh
 
