@@ -1,7 +1,7 @@
 'use strict';
 
 hwc.define([
-    'hwc!{PATH_CORE}modules/js/modules/rsvp/index.js'
+    'hwc!{PATH_CORE}js-modules/rsvp/index.js'
 ], function (RSVP) {
     var $ = this;
 

@@ -53,7 +53,7 @@ var HwcBootstrap = (function () {
     var pub_static = Obj;
 
     // private static
-    var defCore = "../../../../";
+    var defCore = "../";
     var defRoot = defRoot + "../";
     /**
      * 
@@ -222,9 +222,9 @@ var HwcBootstrap = (function () {
     pub.setPaths = function (root, core) {
         this.defines.PATH_ROOT = root;
         this.defines.PATH_CORE = core || root + "hwcore/";
-        this.defines.PATH_JS_SRC = this.defines.PATH_CORE + "modules/js/src/";
-        this.defines.PATH_JS_KERNEL = this.defines.PATH_JS_SRC + "kernel/";
-        this.defines.PATH_JS_LIB = this.defines.PATH_JS_SRC + "library/";
+        this.defines.PATH_JS_SRC = this.defines.PATH_CORE;
+        this.defines.PATH_JS_KERNEL = this.defines.PATH_JS_SRC + "js-kernel/";
+        this.defines.PATH_JS_LIB = this.defines.PATH_JS_SRC + "js-lib-";
     };
 
     pub.initBrowser = function () {
@@ -338,7 +338,7 @@ var HwcBootstrap = (function () {
                 };
             }
 
-            script.src = that.defines.PATH_CORE + 'modules/js/modules/requirejs/requirejs/index.js';
+            script.src = that.defines.PATH_CORE + 'js-modules/requirejs/requirejs/index.js';
             document.currentScript.parentNode.appendChild(script);
         };
 
@@ -369,7 +369,7 @@ var HwcBootstrap = (function () {
 
         this.setPaths(rootPath, corePath);
 
-        var requirejs = require(this.defines.PATH_CORE + 'modules/js/modules/requirejs/r/index.js').config({
+        var requirejs = require(this.defines.PATH_CORE + 'js-modules/requirejs/r/index.js').config({
             //Pass the top-level main.js/index.js require
             //function to requirejs so that node modules
             //are loaded relative to the top-level JS file.
