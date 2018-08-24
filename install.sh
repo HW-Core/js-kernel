@@ -21,6 +21,9 @@ if Joiner:with_dev ; then
     
     Joiner:add_file "http://sinonjs.org/releases/sinon-1.10.3.js" $mod_path"/sinon/index.js"
     Joiner:add_file "http://chaijs.com/chai.js" $mod_path"/chai/index.js"
+
+    Joiner:add_git_submodule "https://github.com/HW-Core/js-kernel.git" "js-kernel/tests" "tests" "hw-core"
+    Joiner:add_git_submodule "https://github.com/HW-Core/js-kernel.git" "js-kernel/gh-pages" "tests" "hw-core"
 fi
 
 
