@@ -437,8 +437,6 @@ if (!Function.prototype.bind) {
 
             hwc.__core = hwc.Core.I(callback);
 
-            console.log("ok");
-
             defineUtils(hwc);
         };
 
