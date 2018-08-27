@@ -1,13 +1,27 @@
 'use strict';
 /*
- * VERY FIRST DEFINES AND LEGACY
+ * VERY FIRST DEFINES AND POLYFILLS
  */
+
+if (typeof document !== "undefined" && !document.currentScript) {
+    document.currentScript = (function () {
+        var scripts = document.getElementsByTagName('script');
+        return scripts[scripts.length - 1];
+    })();
+}
 
 var __global = typeof window === 'object' ? window : global;
 
 var hwc_conf = { paths: {} };
 
-hwc_conf.path_core = __global.hwc_path ? __global.hwc_path : "modules/hw-code";
+function retrieveCorePath() {
+    // TODO: implement without hacks
+    // for now set hwc_path global variable
+    var hwc_path = document.currentScript.getAttribute('data-hwc-path');
+    return hwc_path ? hwc_path : "module/hw-core"
+}
+
+hwc_conf.path_core = __global.hwc_path ? __global.hwc_path : retrieveCorePath();
 
 hwc_conf.paths.hwc_js_kernel = hwc_conf.path_core + "js-kernel/index";
 hwc_conf.paths.hwc_js_modules_path = hwc_conf.path_core + "js-modules/";
@@ -17,13 +31,7 @@ hwc_conf.paths.hwc_js_modules_jquery = hwc_conf.paths.hwc_js_modules_path + "jqu
 hwc_conf.paths.hwc_js_modules_requirenode = hwc_conf.paths.hwc_js_modules_path + "requirejs/r/index";
 hwc_conf.paths.hwc_js_modules_requirejs = hwc_conf.paths.hwc_js_modules_path + "requirejs/requirejs/index";
 
-
 __global.hwc_conf = hwc_conf;
-
-
-//if (typeof __webpack_require__ === "function") {
-//    require("../js-modules/requirejs/requirejs/require.js");
-//}
 
 // ONLY FOR IE8-
 if (!Array.prototype.indexOf) {
@@ -403,16 +411,12 @@ if (!Function.prototype.bind) {
                 _loadSync(hwc_conf.paths.hwc_js_modules_requirejs + '.js');
             }
 
-            hwc.__requirejs = requirejs;
-
-            hwc.__requirejs.config({
+            requirejs.config({
                 paths: hwc_conf.paths
             });
         };
 
         pub.initNode = function () {
-            hwc.__requirejs = global.requirejs;
-
             setGlobals(global, true);
         }
 
@@ -427,11 +431,16 @@ if (!Function.prototype.bind) {
 
             hwc.Core = HWCore;
 
+            // some aliases for requirejs
             if (this.defines.IN_BROWSER) {
                 this.initBrowser();
             } else {
                 this.initNode();
             }
+
+            hwc.require = hwc.include = hwc.module = hwc.__requirejs = requirejs;
+
+            hwc.define = define;
 
             HWCore.const = hwc.const = this.defines;
 
@@ -445,7 +454,7 @@ if (!Function.prototype.bind) {
 
     function _loadSync(url) {
         // get some kind of XMLHttpRequest
-        var xhrObj = createXMLHTTPObject();
+        var xhrObj = new XMLHttpRequest();
         // open and send a synchronous request
         xhrObj.open('GET', url, false);
         xhrObj.send('');
@@ -535,7 +544,7 @@ if (!Function.prototype.bind) {
 
 })();
 
-define(["hwc_js_modules_rsvp"], function (RSVP) {
+define("hwc_js_kernel", ["hwc_js_modules_rsvp"], function (RSVP) {
     hwc.__core.loading = false;
     hwc.__defineLoader(hwc, RSVP);
 
