@@ -1,9 +1,29 @@
 'use strict';
-
 /*
  * VERY FIRST DEFINES AND LEGACY
- * TODO: old code, re-organizing or remove
  */
+
+var __global = typeof window === 'object' ? window : global;
+
+var hwc_conf = { paths: {} };
+
+hwc_conf.path_core = __global.hwc_path ? __global.hwc_path : "modules/hw-code";
+
+hwc_conf.paths.hwc_js_kernel = hwc_conf.path_core + "js-kernel/index";
+hwc_conf.paths.hwc_js_modules_path = hwc_conf.path_core + "js-modules/";
+hwc_conf.paths.hwc_js_modules_weakmap = hwc_conf.paths.hwc_js_modules_path + "weakmap/index";
+hwc_conf.paths.hwc_js_modules_rsvp = hwc_conf.paths.hwc_js_modules_path + "rsvp/index";
+hwc_conf.paths.hwc_js_modules_jquery = hwc_conf.paths.hwc_js_modules_path + "jquery/index";
+hwc_conf.paths.hwc_js_modules_requirenode = hwc_conf.paths.hwc_js_modules_path + "requirejs/r/index";
+hwc_conf.paths.hwc_js_modules_requirejs = hwc_conf.paths.hwc_js_modules_path + "requirejs/requirejs/index";
+
+
+__global.hwc_conf = hwc_conf;
+
+
+//if (typeof __webpack_require__ === "function") {
+//    require("../js-modules/requirejs/requirejs/require.js");
+//}
 
 // ONLY FOR IE8-
 if (!Array.prototype.indexOf) {
@@ -45,142 +65,440 @@ if (!Function.prototype.bind) {
     };
 }
 
-var HwcBootstrap = (function () {
-    var Obj = function _Bootstrap () {
-    };
-
-    var pub = Obj.prototype;
-    var pub_static = Obj;
-
-    // private static
-    var defCore = "../";
-    var defRoot = defRoot + "../";
-    /**
-     * 
-     * Data attributes
+(function () {
+    /*
+     * ==============================
+     *
+     * Core class
+     * @type Obj
+     *
+     * ==============================
      */
-    var abAttr = "data-hwc-after-boot"; // after boot attribute name
-    var rootPathAttr = "data-hwc-path-root";
-    var corePathAttr = "data-hwc-path-core";
-    // attribute to auto-initialize hwcore 
-    var autoAttr = "data-hwc-auto-init";
-    // using this attribute instead you must call hwc.init function manually
-    var manualAttr = "data-hwc-manual-init";
 
-    var __include = function () {
-        var that = this;
-        var includes = arguments;
-        Array.isArray(arguments[0]) && (includes = arguments[0]);
+    var HWCore = (function () {
+        var _Core = function (id) {
+            // each instance of core must define its scope
+            var scope = {};
+            scope.id = id;
+            scope.const = pub_static.const;
 
-        var obj = function (module) {
-            return obj.define(module);
+            scope.global = scope.const.IN_BROWSER ? window : global;
+
+            // a new instance must return
+            // the created scope, not Core class itself
+            return scope;
         };
 
-        obj.define = function (module) {
-            return that.define(includes, module);
+        var pub = _Core.prototype;
+        var pub_static = _Core;
+
+        // private static
+        var _instance = [];
+
+        pub_static.const = {};
+        pub_static.I = function (id, callback) {
+            callback = typeof id === "function" && typeof callback === "undefined" ? id : callback;
+            id = typeof id !== "string" ? 0 : id;
+
+            if (typeof _instance[id] === "undefined") {
+                _instance[id] = {
+                    loading: true,
+                    inst: null
+                };
+
+                _instance[id].inst = new _Core(id);
+
+                if (typeof callback === "function") {
+                    callback.apply(_instance[id].inst);
+                }
+            } else {
+                var wait = function () {
+                    // if new instance has been commited but not loaded
+                    // fully, we must wait before cast the callback
+                    if (_instance[id].loading) {
+                        setTimeout(wait, 0); // maybe not the best way?
+                    } else {
+                        if (typeof callback === "function") {
+                            callback.apply(_instance[id].inst);
+                        }
+                    }
+                };
+
+                wait();
+            }
+
+            return _instance[id];
         };
 
-        obj.defineFn = function (module) {
-            return that.defineFn(includes, module);
+        pub_static.delInstance = function (id) {
+            _instance.splice(id, 1);
         };
 
-        return obj;
-    };
+        return pub_static;
+    })();
 
-    var hwc = {
-        // magic define
-        set exports (module) {
-            this.define([], module);
-        },
-        Module: function (def, args) {
-            this.module = def;
-            this.args = args;
-        },
-        __pendingDefines: [],
-        __pendingFunc: [],
-        include: __include,
-        require: __include, // just an alias of include for now
+    /*
+     * ==============================
+     *
+     * Loader Class
+     *
+     * ==============================
+     */
+    function defineLoader($, RSVP) {
+        var Loader = function () {
+        };
+
+        var pub = Loader.prototype;
+        var pub_static = Loader;
+
+        pub_static.paths = {};
+
         /**
-         * requirejs alias
+         *
+         * @param {String} src -> paths of resource to load
+         * @param {Function} callback -> function to cast as callback, if omitted
+         * a promise will be returned
+         * @param {Object} options :
+         *  {Boolean} skipPlg -> skip hwc plugin
+         * @returns {Mixed}
          */
-        define: function () {
-            /**
-             * if you have to target also browser that doesn't support 
-             * document.currentScript, please use the after-boot option or defineFn
-             * and include libraries using hwc.include
-             */
-            if (this.isInBrowser() && document.currentScript) {
-                if (!document.currentScript.src) {
-                    // this is the case of modules defined inside a <script> tag
-                    // without using a file
-                    this.defineFn.apply(this, arguments);
+        pub_static.load = function (src, callback, options) {
+            options = options || {};
+            src = Array.isArray(src) ? src : [src];
 
-                    return;
-                } else if (!this.__rdefine) {
-                    // if hwc has not been initialized yet, we must defer the module loading
-                    this.__pendingDefines.push(document.currentScript.src);
-                    return;
+            function _load(resolve, reject, callback) {
+                function done() {
+                    var result = arguments;
+                    if (callback) {
+                        if (typeof callback !== "function")
+                            throw new Error("callback type is: " + typeof (callback));
+
+                        callback.apply($, result);
+                    } else {
+                        resolve.apply(null, result);
+                    }
+                }
+
+                try {
+                    hwc.__requirejs(src, done, function (err) {
+                        if (callback) {
+                            throw err;
+                        } else {
+                            reject(err);
+                        }
+                    });
+                } catch (e) {
+                    if (callback) {
+                        throw new Exception(e);
+                    } else {
+                        reject(e);
+                    }
                 }
             }
 
-            var args;
-            switch (arguments.length) {
-                case 1:
-                    var def = arguments[0];
+            return callback && _load(null, null, callback) || new $.Promise(_load)["catch"](function (e) {
+                console.error(e); // this is needed because Async lib is not loaded yet
+            });
+        };
 
-                    var hwcModule = function () {
-                        return new hwc.Module(def, arguments);
-                    };
-                    hwcModule.__isHwcModule = true;
+        /**
+         *
+         * @param {String} src -> path of resource to load
+         * @returns {Mixed}
+         */
+        pub_static.loadSync = function (src) {
+            var _src = Array.isArray(src) ? src : [src];
 
-                    args = [hwcModule];
-                    break;
-                case 2:
-                    var def = arguments[1];
+            var lSync = function (url) {
+                if ($.const.IN_BROWSER) {
+                    _loadSync(url);
+                } else {
+                    //require(["./"+url]);
+                }
+            };
 
-                    var hwcModule = function () {
-                        return new hwc.Module(def, arguments);
-                    };
-                    hwcModule.__isHwcModule = true;
-
-                    args = [arguments[0], hwcModule];
-                    break;
-                default:
-                    throw new SyntaxError("Invalid number of parameters");
+            if (_src.length > 1) {
+                var modules = [];
+                for (var i in _src) {
+                    modules.push(lSync(_src[i]));
+                }
+                return modules;
+            } else {
+                return lSync(_src[0]);
             }
 
-            this.__rdefine.apply(null, args);
-        },
-        getPendingDefines: function () {
-            return this.__pendingDefines;
-        },
-        getPendingFunc: function () {
-            return this.__pendingFunc;
-        },
+        };
+
+        Object.defineProperty($, "Loader", {
+            configurable: false,
+            writable: false,
+            value: Loader
+        });
+
+        /**
+         * Alternatives for loading in PHP-style
+         */
+        Object.defineProperty($, "include", {
+            configurable: false,
+            writable: false,
+            value: $.Loader.load
+        });
+
+        Object.defineProperty($, "require", {
+            configurable: false,
+            writable: false,
+            value: $.Loader.load
+        });
+
+        Object.defineProperty($, "includeSync", {
+            configurable: false,
+            writable: false,
+            value: $.Loader.loadSync
+        });
+
+        Object.defineProperty($, "requireSync", {
+            configurable: false,
+            writable: false,
+            value: $.Loader.loadSync
+        });
+
+        Object.defineProperty($, "RSVP", {
+            configurable: false,
+            writable: false,
+            value: RSVP
+        });
+
+        Object.defineProperty($, "Promise", {
+            configurable: false,
+            writable: false,
+            value: RSVP.Promise
+        });
+    }
+
+    /*
+     * ==============================
+     *
+     * Utils
+     *
+     * ==============================
+     */
+
+    function defineUtils($) {
+        // property getter that walks in chain
+        !function (Object, getPropertyDescriptor, getPropertyNames) {
+            if (!(getPropertyDescriptor in Object)) {
+                var getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
+                Object[getPropertyDescriptor] = function getPropertyDescriptor(o, name) {
+                    var proto = o, descriptor;
+                    while (proto && !(
+                        descriptor = getOwnPropertyDescriptor(proto, name))
+                    )
+                        proto = proto.__proto__;
+                    return descriptor;
+                };
+            }
+            if (!(getPropertyNames in Object)) {
+                var getOwnPropertyNames = Object.getOwnPropertyNames, ObjectProto = Object.prototype, keys = Object.keys;
+                Object[getPropertyNames] = function getPropertyNames(o) {
+                    var proto = o, unique = {}, names, i;
+                    while (proto != ObjectProto) {
+                        for (names = getOwnPropertyNames(proto), i = 0; i < names.length; i++) {
+                            unique[names[i]] = true;
+                        }
+                        proto = proto.__proto__;
+                    }
+                    return keys(unique);
+                };
+            }
+        }(Object, "getPropertyDescriptor", "getPropertyNames");
+
+        $.typeOf = function (obj) {
+            return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
+        };
+
+        /**
+         *
+         * @param {type} type
+         * @param {type} val
+         * @param {type} skipError, if set to true then return a boolean instead throw an error
+         * @returns {undefined}
+         */
+        $.typeCompare = function (type, val, skipError) {
+            if (val === null || val === undefined)
+                return true;
+
+            if (typeof type === "string") {
+                var t = $.typeOf(val);
+                if (t !== type) {
+                    if (skipError)
+                        return false;
+                    // else
+                    throw new TypeError("Incompatible type: " + t + " , excepted " + type);
+                }
+            } else {
+                if (!(val.constructor === type)) {
+                    if (skipError)
+                        return false;
+                    // else
+                    throw new TypeError("Incompatible type: " + typeof val + " , excepted " + type.name);
+                }
+            }
+
+            return true;
+        };
+
+        $.typeFn = function (/* arguments type, function */) {
+
+        };
+    }
+
+    /*
+     * ==============================
+     *
+     * HwcBootstrap
+     * @type Obj
+     *
+     * ==============================
+     */
+
+    var HwcBootstrap = (function () {
+        var Obj = function _Bootstrap() {
+        };
+
+        var pub = Obj.prototype;
+        var pub_static = Obj;
+
+        var setGlobals = function (global, skipExtra) {
+            //      global namespaced
+
+            global.hwc = hwc;
+            global.hwc.defTests = global.hwc.define; // special use for tests
+            hwc.__global = global;
+
+            if (!skipExtra) {
+                //      in environments without module system
+                try {
+                    global.module = {};
+                    global.exports = global.module.exports = global.hwc.exports;
+                } catch (e) {
+                    // nothing to do
+                }
+            }
+        };
+
+        pub.initBrowser = function () {
+            setGlobals(window);
+
+            if (hwc.isRequireJs()) {
+                // nothing to do for now
+            } else if (hwc.isWebPack()) {
+                var req = require;
+                var def = define;
+                require("script-loader!hwc_js_modules_requirejs");
+                /*window.hwc.define=window.define;
+                window.hwc.require=window.require;
+                require=req;
+                define=def;*/
+            } else {
+                _loadSync(hwc_conf.paths.hwc_js_modules_requirejs + '.js');
+            }
+
+            hwc.__requirejs = requirejs;
+
+            hwc.__requirejs.config({
+                paths: hwc_conf.paths
+            });
+        };
+
+        pub.initNode = function () {
+            hwc.__requirejs = global.requirejs;
+
+            setGlobals(global, true);
+        }
+
+        pub.init = function (callback) {
+            this.defines = {};
+            this.defines.IN_BROWSER = hwc.isInBrowser();
+
+            this.defines.PATH_CORE = hwc.conf.path_core || "../";
+            this.defines.PATH_ROOT = this.defines.PATH_CORE + "../";
+            this.defines.PATH_JS_KERNEL = this.defines.PATH_CORE + "js-kernel/index.js";
+            this.defines.PATH_JS_LIB = this.defines.PATH_CORE + "js-lib-";
+
+            hwc.Core = HWCore;
+
+            if (this.defines.IN_BROWSER) {
+                this.initBrowser();
+            } else {
+                this.initNode();
+            }
+
+            HWCore.const = hwc.const = this.defines;
+
+            hwc.__core = hwc.Core.I(callback);
+
+            console.log("ok");
+
+            defineUtils(hwc);
+        };
+
+        return Obj;
+    })();
+
+    function _loadSync(url) {
+        // get some kind of XMLHttpRequest
+        var xhrObj = createXMLHTTPObject();
+        // open and send a synchronous request
+        xhrObj.open('GET', url, false);
+        xhrObj.send('');
+        // add the returned content to a newly created script tag
+        var se = document.createElement('script');
+        se.type = "text/javascript";
+        se.text = xhrObj.responseText;
+        var position = document.currentScript && document.currentScript.parentNode ? document.currentScript.parentNode : document.head;
+        position.appendChild(se);
+    }
+
+    /*
+     * ==============================
+     *
+     *  hwc global static object
+     *
+     * ==============================
+     */
+
+    var hwc = {
+        conf: hwc_conf,
+        __defineLoader: defineLoader,
+        __pendingFunc: [],
         defineFn: function () {
             if (!this.__core || !this.__core.Loader) {
                 this.__pendingFunc.push(arguments);
             } else {
                 switch (arguments.length) {
                     case 1:
-                        arguments[0].call(this.__core);
+                        return arguments[0].call(this.__core);
                         break;
                     case 2:
                         var inc = arguments[0];
                         var def = arguments[1];
                         var that = this;
-                        this.__core.Loader.load(inc)
-                            .then(function () {
-                                def.apply(that.__core, arguments);
-                            });
+                        return this.__core.Loader.load(inc, function () {
+                            def.apply(that.__core, arguments);
+                        });
                         break;
                     default:
                         throw new SyntaxError("Invalid number of parameters");
                 }
             }
         },
-        I: function () {
-            return this.__core.I();
+        /**
+         *
+         * @param {type} id -> leave blank to retreive main instance
+         * @returns {unresolved}
+         */
+        I: function (id) {
+            return this.Core.I(id);
         },
         getCoreClass: function () {
             return this.__core;
@@ -188,266 +506,40 @@ var HwcBootstrap = (function () {
         isInBrowser: function () {
             return typeof window !== "undefined";
         },
-        /**
-         * will be override on node and when manually init
-         */
-        init: function () {
-            console.error("Cannot init! Is Core automatically initialized?");
+        isWebPack: function () {
+            return typeof __webpack_require__ === "function";
+        },
+        isRequireJs: function () {
+            return typeof requirejs === 'function';
+        },
+        getGlobalObj: function () {
+            return this.__global;
         },
         /*
          * Internal used
          */
         // will be defined next
-        __rdefine: null,
-        __core: null
-    };
-
-    var setGlobals = function (global, skipExtra) {
-//      global namespaced
-
-        global.hwc = hwc;
-        global.hwc.defTests = global.hwc.define; // special use for tests
-
-        if (!skipExtra) {
-//      in environments without module system
-            try {
-                global.module = {};
-                global.exports = global.module.exports = global.hwc.exports;
-            } catch (e) {
-                // nothing to do  
-            }
-        }
-    };
-
-    pub.setPaths = function (root, core) {
-        this.defines.PATH_ROOT = root;
-        this.defines.PATH_CORE = core || root + "hwcore/";
-        this.defines.PATH_JS_SRC = this.defines.PATH_CORE;
-        this.defines.PATH_JS_KERNEL = this.defines.PATH_JS_SRC + "js-kernel/";
-        this.defines.PATH_JS_LIB = this.defines.PATH_JS_SRC + "js-lib-";
-    };
-
-    pub.initBrowser = function () {
-        /**
-         * Used to resolve kernel url automatically if possible
-         * on browser
-         */
-        function resolveKernelUrl (currScript) {
-            return currScript && currScript.src || function () {
-                // the latest and worst chance to retreive it
-
-                var matcher = function (stack, matchedLoc) {
-                    return loc = matchedLoc;
-                };
-
-                try {
-
-                    // Invalid code
-                    0();
-
-                } catch (ex) {
-
-                    if (fileName in ex) { // Firefox
-                        loc = ex[fileName];
-                    } else if (stackTrace in ex) { // Opera
-                        ex[stackTrace].replace(/called from line \d+, column \d+ in (.*):/gm, matcher);
-                    } else if (stack in ex) { // WebKit, Blink and IE10
-                        ex[stack].replace(/at.*?\(?(\S+):\d+:\d+\)?$/g, matcher);
-                    }
-
-                    return loc;
-                }
-            }();
-        }
-
-        var that = this;
-
-        var currScript = this.getCurrentScriptTag() || {};
-
-        var corePath = currScript[corePathAttr] ||
-            window["HWCPATH_CORE"] ||
-            function () {
-                var prefix = currScript.src ? that.dirName(currScript.src) + "/" : "";
-                return prefix + defCore;
-            }();
-
-        corePath = this.qualifyURL(corePath);
-        corePath.slice(-1) != "/" && (corePath += "/"); // set last char
-
-        var rootPath = currScript[rootPathAttr] ||
-            window["HWCPATH_ROOT"] ||
-            (currScript.src ? that.dirName(currScript.src) + "/" + defRoot : corePath + "../");
-
-        rootPath = this.qualifyURL(rootPath);
-
-        this.setPaths(rootPath, corePath);
-
-        // afterScript can be defined by script custom data attribute ( priority and suggested )
-        // or using global const , otherwise the init process must be done manually later
-        // via hwc.init(myAfterScript);
-        var afterScript = (currScript["getAttribute"] && currScript.getAttribute(abAttr))
-            || window["HWC_AFTERBOOT"] || false;
-
-        setGlobals(window);
-
-        function loadKernel (defines, afterScript) {
-            var req = requirejs.config({
-            });
-
-            req([defines.PATH_JS_KERNEL + "Core.js"], function (HWCore) {
-                HWCore.const = window.hwc.const = that.defines;
-                HWCore.I(function () {
-                    var $ = this;
-                    // this allows to load all modules defined before hw-core initialization
-                    $.Loader.load($.global.hwc.getPendingDefines()).then(function () {
-                        try {
-                            if (afterScript) {
-                                if (typeof afterScript === "function") {
-                                    return afterScript.call($);
-                                } else if (typeof window[afterScript] === "function") {
-                                    return window[afterScript].call($);
-                                } else {
-                                    return $.Loader.load(afterScript);
-                                }
-                            }
-                        } catch (e) {
-                            console.log(e.stack);
-                        }
-                    });
-                });
-            });
-        }
-
-        /**
-         * 
-         * @param {function|string} afterScript : can be a path, a function name or a function
-         */
-        var init = function (afterScript) {
-            var script = document.createElement("script");
-            script.type = "text/javascript";
-            if (script.readyState) {  //IE
-                script.onreadystatechange = function () {
-                    if (script.readyState === "loaded" || script.readyState === "complete") {
-                        script.onreadystatechange = null;
-                        loadKernel(that.defines, afterScript);
-                    }
-                };
-            } else {  //Others
-                script.onload = function () {
-                    loadKernel(that.defines, afterScript);
-                };
-            }
-
-            script.src = that.defines.PATH_CORE + 'js-modules/requirejs/requirejs/index.js';
-            document.currentScript.parentNode.appendChild(script);
-        };
-
-        // by default hwcore always init automatically
-        // except if manual-attribute is used
-        if (!currScript[manualAttr]) {
-            init(afterScript);
-        } else {
-            /**
-             * 
-             * @param {function|string} afterScript : can be a path, a function name or a function
-             * @returns window.hwc
-             */
-            window.hwc.init = function (afterScript) {
-                init(afterScript);
-                return window.hwc;
-            };
-        }
-    };
-
-    pub.initNode = function () {
-        var path = require("path");
-        var rootPath = path.join(__dirname, defRoot);
-        var corePath = path.join(__dirname, defCore);
-        // convert from relative to absolute
-        rootPath = path.resolve(rootPath) + "/";
-        corePath = path.resolve(corePath) + "/";
-
-        this.setPaths(rootPath, corePath);
-
-        var requirejs = require(this.defines.PATH_CORE + 'js-modules/requirejs/r/index.js').config({
-            //Pass the top-level main.js/index.js require
-            //function to requirejs so that node modules
-            //are loaded relative to the top-level JS file.
-            nodeRequire: require
-        });
-
-        setGlobals(global, true);
-
-        var HWCore = requirejs(this.defines.PATH_JS_KERNEL + "Core.js");
-        HWCore.const = global.hwc.const = this.defines;
-        // export global hwc namespace
-        // you can use .I() to instantiate then
-        global.hwc.init = function (callback) {
-            HWCore.I(callback);
-            return global.hwc;
-        };
-        return global.hwc;
-    };
-
-    pub.init = function () {
-        this.defines = {};
-        this.defines.IN_BROWSER = hwc.isInBrowser();
-
-        if (this.defines.IN_BROWSER) {
-            this.initBrowser();
-        } else {
-            module.exports = this.initNode();
-        }
+        __core: null,
+        __global: null,
+        __requirejs: null
     };
 
 
-    /*
-     * Bootstrap utils
-     * Can be reused in other libs
+    /**
+     * INIT
+     *
      */
 
+    var newInst = new HwcBootstrap().init();
 
-    pub.dirName = function (path) {
-        return path.replace(/\\/g, '/').replace(/\/[^\/]*\/?$/, '');
-    };
-
-
-    pub.escapeHTML = function (s) {
-        return s.split('&').join('&amp;').split('<').join('&lt;').split('"').join('&quot;');
-    };
-
-    pub.qualifyURL = function (url) {
-        var el = document.createElement('div');
-        el.innerHTML = '<a href="' + this.escapeHTML(url) + '">#</a>';
-        return el.firstChild.href;
-    };
-
-
-    pub.getCurrentScriptTag = function () {
-        return document.currentScript || // the fatest way if running on modern and compatible browser
-            function () {
-                // most browsers , but you need to specify hwc-after-boot in script tag
-                return document.querySelector('script[' + abAttr + ']');
-            }() ||
-            (function () {
-                // if you need to avoid afterBoot to manually run it and keep compatibility with oldest browser
-                // you can add an id attribute  to your tag
-                return document.querySelector('script[' + autoAttr + ']') || document.querySelector('script[' + manualAttr + ']');
-            }()) ||
-            (function () {
-                // alternative if not custom data attributes specified, but not always secure/works
-                return document.querySelector('script[src*="hwcore/modules/js/src/kernel/index.js"]');
-            }()) ||
-            null;
-    };
-
-    return Obj;
+    if (hwc.isInBrowser())
+        module.exports = hwc.I();
 
 })();
 
-/**
- * INIT
- * 
- */
+define(["hwc_js_modules_rsvp"], function (RSVP) {
+    hwc.__core.loading = false;
+    hwc.__defineLoader(hwc, RSVP);
 
-new HwcBootstrap().init();
+    return hwc;
+});

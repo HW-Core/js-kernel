@@ -74,6 +74,9 @@ local.properties
 .texlipse
 
 
+node_modules
+
+
 #
 # HWCore files
 #
