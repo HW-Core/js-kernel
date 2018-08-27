@@ -1,0 +1,20 @@
+title: JS-Kernel
+description: Kernel module for HW-Core framework
+show_downloads: true
+git_branch: gh-pages
+logo_url: https://avatars0.githubusercontent.com/u/6638895?v=3&s=200
+google_analytics:
+theme: 
+wiki_folder: wiki
+use_github_wiki: false
+use_prose_io: true
+google_cse_token: 
+custom_head: false
+custom_sidebar: true
+custom_footer: false
+gems:
+  - jekyll-sitemap
+  - jekyll-mentions
+  - jemoji
+  - jekyll-redirect-from
+  - jekyll-feed
