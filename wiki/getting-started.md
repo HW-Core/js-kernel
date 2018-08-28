@@ -24,7 +24,7 @@ After the [installation](wiki/installation) , you can use following bootstrap co
 
 **if you want run it on server, it's the bootstrap for nodejs (index.js):** 
 
-    var hwc = require("your-module-path/hw-core/js-kernel/index.node");
+    var hwc = require("your-module-path/hw-core/js-kernel");
 
     hwc.init(function() {
         // you can write your code here using hw-core features
