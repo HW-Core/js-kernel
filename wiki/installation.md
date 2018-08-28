@@ -17,6 +17,6 @@ Run this command in your bash console (even on windows) and this repository will
 
     git pull origin master && bash ./install.sh
 
-### Method 3: npm (soon)
+### Method 3: npm
 
-
+    npm i @hw-core/js-kernel
