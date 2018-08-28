@@ -1,5 +1,5 @@
 var hwc_requirejs = require("./node.require");
 
-var kernel = requirejs("./index.js");
+requirejs(__dirname+"/index.js");
 
-module.exports = kernel;
+module.exports = hwc;

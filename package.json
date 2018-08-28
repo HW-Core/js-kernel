@@ -1,7 +1,24 @@
 {
-  "name": "js-kernel",
+  "name": "@hw-core/js-kernel",
+  "version": "2.0.7",
+  "description": "This is the kernel module of hw-core for javascript",
+  "keywords": [
+    "kernel",
+    "framework",
+    "javascript",
+    "ES5",
+    "ES6"
+  ],
+  "author": "hw-core, Yehonal",
+  "license": "AGPL3",
+  "homepage": "https://hw-core.github.io/js-kernel/",
+  "main": "index.node.js",
   "scripts": {
+    "pub": "npm run build && npm publish --access public",
     "build": "webpack --progress"
+  },
+  "dependencies": {
+    "@hw-core/js-modules": "^2.0.0"
   },
   "devDependencies": {
     "script-loader": "^0.7.2",

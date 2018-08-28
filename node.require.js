@@ -5,7 +5,7 @@ global.hwc_path = path.resolve(__dirname + "/../") + "/";
 var requirenodePath = global.hwc_path + "js-modules/requirejs/r/index";
 global.requirejs = require(requirenodePath);
 
-var wpconf = require("./webpack.config");
+var hwc_conf = require("./webpack.paths");
 
 global.requirejs.config({
     nodeRequire: require,
